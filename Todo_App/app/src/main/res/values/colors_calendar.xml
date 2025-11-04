@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Category Colors -->
+    <color name="category_finance">#007AFF</color>
+    <color name="category_health">#34C759</color>
+    <color name="category_fitness">#FF9500</color>
+    <color name="category_general">#666666</color>
+</resources>

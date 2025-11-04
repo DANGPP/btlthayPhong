@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">NoteApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <!-- Path effects -->
+    <string name="dotted_path_effect">20 10</string>
+    
+    <!-- Calendar strings -->
+    <string name="calendar_tab">Calendar</string>
+    <string name="day_view">Day</string>
+    <string name="week_view">Week</string>
+    <string name="month_view">Month</string>
+    
+    <!-- Weekday labels for calendar -->
+    <string-array name="custom_weekdays">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+</resources>

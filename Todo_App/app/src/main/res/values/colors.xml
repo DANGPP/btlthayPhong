@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gray">#F5F5F5</color>
+    <color name="red">#fc0303</color>
+
+    <color name="random1">#6750A4</color>
+    <color name="random2">#FFFFFF</color>
+    <color name="random3">#EADDFF</color>
+    <color name="random4">#7D5260</color>
+    <color name="random5">#FFD8E4</color>
+    <color name="random6">#F9DEDC</color>
+    <color name="random7">#FFFFFF</color>
+    <color name="green">#22d652</color>
+
+    <!-- Light Theme Colors -->
+    <color name="light_text_primary">#212121</color>
+    <color name="light_text_secondary">#757575</color>
+    <color name="light_card_background">#FFFFFF</color>
+    <color name="light_surface_variant">#F5F5F5</color>
+
+    <!-- Calendar and UI Colors -->
+    <color name="primary_color">#6750A4</color>
+    <color name="background_color">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_primary">#1C1B1F</color>
+    <color name="text_secondary">#49454F</color>
+    <color name="text_tertiary">#79747E</color>
+
+    <!-- Priority Colors -->
+    <color name="priority_low">#4CAF50</color>
+    <color name="priority_medium">#FF9800</color>
+    <color name="priority_high">#F44336</color>
+    <color name="priority_urgent">#9C27B0</color>
+
+    <!-- Status Colors -->
+    <color name="status_todo">#2196F3</color>
+    <color name="status_in_progress">#FF9800</color>
+    <color name="status_completed">#4CAF50</color>
+    <color name="status_on_hold">#9E9E9E</color>
+    <color name="status_cancelled">#607D8B</color>
+    
+    <!-- Material Design Colors -->
+    <color name="purple_500">#9C27B0</color>
+    <color name="teal_700">#00796B</color>
+    
+    <!-- Smart Schedule Colors -->
+    <color name="light_gray">#E0E0E0</color>
+    <color name="primary_text_color">#1C1B1F</color>
+    <color name="secondary_text_color">#49454F</color>
+    <color name="category_background">#E3F2FD</color>
+    <color name="category_text_color">#1976D2</color>
+    <color name="error_background">#FFEBEE</color>
+    <color name="error_text_color">#C62828</color>
+</resources>

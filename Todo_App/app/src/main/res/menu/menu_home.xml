@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item
+        android:id="@+id/search"
+        android:title="Search"
+        android:icon="@drawable/baseline_search_24"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/sort"
+        android:title="Sort"
+        android:icon="@drawable/baseline_sort_24"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/custom"
+        android:title="Custom"
+        android:icon="@drawable/baseline_grid_on_24"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/logout"
+        android:title="Logout"
+        android:icon="@android:drawable/ic_lock_power_off"
+        app:showAsAction="never"/>
+</menu>

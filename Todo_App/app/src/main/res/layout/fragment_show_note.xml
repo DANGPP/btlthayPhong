@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".fragment.ShowNoteFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_show_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/menu_show_note"
+        android:background="@color/gray"
+        />
+    <LinearLayout
+        android:layout_below="@+id/toolbar_show_note"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/txt_show_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="42dp"
+            android:textStyle="bold"
+            android:text="title" />
+        <TextView
+            android:id="@+id/txt_show_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="26dp"
+            android:text="description" />
+    </LinearLayout>
+
+</RelativeLayout>

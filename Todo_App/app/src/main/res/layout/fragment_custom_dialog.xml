@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.CustomDialogFragment">
+
+    <ImageView
+        android:id="@+id/img_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_info_24"
+        android:layout_centerHorizontal="true"
+        />
+    <TextView
+        android:id="@+id/txt_saveChange"
+        android:layout_marginVertical="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_info"
+        android:text="Are you sure you want to save the changes?"
+        android:layout_centerHorizontal="true"
+        android:textSize="20dp"
+        />
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_below="@id/txt_saveChange">
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:background="@drawable/btn_cancel_shape"
+            android:gravity="center"
+            android:text="Cancel"
+            android:textSize="20dp"/>
+        <TextView
+            android:id="@+id/btn_save"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_save_shape"
+            android:layout_marginHorizontal="30dp"
+            android:gravity="center"
+            android:textSize="20dp"
+            android:text="Save"/>
+    </LinearLayout>
+
+</RelativeLayout>
