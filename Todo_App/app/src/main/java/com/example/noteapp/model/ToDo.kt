@@ -16,12 +16,19 @@ data class ToDo(
     var category: String = "General",
     var reminderTime: String? = null,
     var estimatedDuration: Int = 0, // in minutes
-    var actualDuration: Int = 0 // in minutes for completed tasks
+    var actualDuration: Int = 0, // in minutes for completed tasks
+    var workspaceId: String? = null, // Link to workspace (null = personal task)
+    var assignedTo: List<String> = emptyList(), // List of user IDs assigned to this task
+    var createdBy: String = "" // User who created the task
 ) : Serializable {
 
     // Computed property for backward compatibility
     val isCompleted: Boolean
         get() = status == TodoStatus.COMPLETED
+    
+    // Check if this is a shared task
+    val isShared: Boolean
+        get() = !workspaceId.isNullOrEmpty()
 
     // Constructor for creating new todos (without ID)
     constructor(
@@ -36,7 +43,10 @@ data class ToDo(
         category: String = "General",
         reminderTime: String? = null,
         estimatedDuration: Int = 0,
-        actualDuration: Int = 0
+        actualDuration: Int = 0,
+        workspaceId: String? = null,
+        assignedTo: List<String> = emptyList(),
+        createdBy: String = ""
     ) : this(
         "",
         title,
@@ -50,7 +60,10 @@ data class ToDo(
         category,
         reminderTime,
         estimatedDuration,
-        actualDuration
+        actualDuration,
+        workspaceId,
+        assignedTo,
+        createdBy
     )
 }
 

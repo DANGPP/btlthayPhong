@@ -7,15 +7,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.appwrite.AppwriteRepository
-import com.example.noteapp.appwrite.AuthService
+import com.example.noteapp.auth.SessionManager
+import com.example.noteapp.auth.AuthRepositoryImpl
 import com.example.noteapp.model.Note
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NoteViewModel(private val context: Context) : ViewModel() {
-    private val appwriteRepository = AppwriteRepository(context)
-    private val authService = AuthService(context)
-    
+    private val appContext = context.applicationContext
+    private val appwriteRepository = AppwriteRepository(appContext)
+    private val sessionManager = SessionManager(appContext)
+    private val authRepository = AuthRepositoryImpl(appContext)
+
     private val _allNotes = MutableLiveData<List<Note>>()
     val allNotes: LiveData<List<Note>> = _allNotes
     
@@ -28,10 +31,10 @@ class NoteViewModel(private val context: Context) : ViewModel() {
     private val _operationSuccess = MutableLiveData<Boolean>()
     val operationSuccess: LiveData<Boolean> = _operationSuccess
 
-    // Get current user ID from AuthService
+    // Get current user ID from SessionManager
     private suspend fun getCurrentUserId(): String? {
         return try {
-            authService.getCurrentUser()?.id
+            sessionManager.getCurrentUserId()
         } catch (e: Exception) {
             _error.postValue("Failed to get current user: ${e.message}")
             null

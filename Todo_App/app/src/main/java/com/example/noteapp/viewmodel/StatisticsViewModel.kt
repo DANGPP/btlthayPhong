@@ -1,5 +1,6 @@
 package com.example.noteapp.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,13 +8,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.model.*
 import com.example.noteapp.repository.StatisticsRepository
-import com.example.noteapp.appwrite.AuthService
+import com.example.noteapp.auth.SessionManager
 import kotlinx.coroutines.launch
 
-class StatisticsViewModel(private val context: android.content.Context) : ViewModel() {
+class StatisticsViewModel(private val context: Context) : ViewModel() {
     private val statisticsRepository = StatisticsRepository()
-    private val authService = AuthService(context)
-    
+    private val appContext = context.applicationContext
+    private val sessionManager = SessionManager(appContext)
+
     private val _todoStatistics = MutableLiveData<TodoStatistics>()
     val todoStatistics: LiveData<TodoStatistics> = _todoStatistics
     
@@ -37,7 +39,7 @@ class StatisticsViewModel(private val context: android.content.Context) : ViewMo
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val userId = authService.getCurrentUserId()
+                val userId = sessionManager.getCurrentUserId()
                 if (userId != null) {
                     
                     // Load all statistics
@@ -65,7 +67,7 @@ class StatisticsViewModel(private val context: android.content.Context) : ViewMo
         loadStatistics()
     }
     
-    class StatisticsViewModelFactory(private val context: android.content.Context) : ViewModelProvider.Factory {
+    class StatisticsViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(StatisticsViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")

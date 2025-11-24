@@ -9,18 +9,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.appwrite.AppwriteRepository
-import com.example.noteapp.appwrite.AuthService
 import com.example.noteapp.model.ToDo
 import com.example.noteapp.repository.NotificationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.noteapp.auth.SessionManager
 
 class ToDoViewModel(private val context: Context) : ViewModel() {
-    private val repository = AppwriteRepository(context)
-    private val authService = AuthService(context)
-    private val notificationRepository = NotificationRepository(context)
-    
+    // Use applicationContext to avoid leaking an Activity/Fragment context
+    private val appContext = context.applicationContext
+    private val repository = AppwriteRepository(appContext)
+    private val sessionManager = SessionManager(appContext)
+    private val notificationRepository = NotificationRepository(appContext)
+
     init {
         Log.d("ToDoViewModel", "ViewModel instance created: ${this.hashCode()}")
     }
@@ -42,7 +44,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     private suspend fun showToast(message: String) {
         withContext(Dispatchers.Main) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(appContext, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -50,7 +52,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
         _isLoading.postValue(true)
         Log.d("ToDoViewModel", "insertTodo called on ViewModel instance: ${this@ToDoViewModel.hashCode()}")
         Log.d("ToDoViewModel", "Now getting current user ID")
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             Log.e("ToDoViewModel", "User not authenticated, cannot create todo")
             _error.postValue("User not authenticated. Please login again.")
@@ -84,7 +86,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
     fun loadAllTodos() = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
         Log.d("ToDoViewModel", "Loading all todos")
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             Log.e("ToDoViewModel", "User not authenticated, cannot load todos")
             _shouldRedirectToLogin.postValue(true)
@@ -135,7 +137,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun loadAllTodosSortedByCreatedTimeASC() = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -148,7 +150,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun loadAllTodosSortedByCreatedTimeDESC() = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -173,7 +175,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun searchTodos(searchQuery: String) = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -186,7 +188,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun getTodosByCompletionStatus(isCompleted: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -199,7 +201,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun getTodosByPriority(priority: com.example.noteapp.model.TodoPriority) = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -212,7 +214,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun getTodosByCategory(category: String) = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -225,7 +227,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun getTodosDueToday(todayDate: String) = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)
@@ -277,7 +279,7 @@ class ToDoViewModel(private val context: Context) : ViewModel() {
 
     fun getTodosByStatus(status: com.example.noteapp.model.TodoStatus) = viewModelScope.launch(Dispatchers.IO) {
         _isLoading.postValue(true)
-        val userId = authService.getCurrentUserId()
+        val userId = sessionManager.getCurrentUserId()
         if (userId == null) {
             _shouldRedirectToLogin.postValue(true)
             _isLoading.postValue(false)

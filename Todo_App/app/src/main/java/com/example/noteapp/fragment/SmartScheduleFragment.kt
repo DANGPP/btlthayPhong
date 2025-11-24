@@ -8,9 +8,7 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.net.Uri
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -19,7 +17,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.noteapp.auth.AuthRepositoryImpl
+import com.example.noteapp.auth.SessionManager
+import kotlinx.coroutines.launch
 import com.example.noteapp.R
 import com.example.noteapp.adapter.TodoPreviewAdapter
 import com.example.noteapp.databinding.FragmentSmartScheduleBinding
@@ -34,6 +37,11 @@ class SmartScheduleFragment : Fragment() {
     
     private val viewModel: SmartScheduleViewModel by viewModels()
     private lateinit var previewAdapter: TodoPreviewAdapter
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
     
     private val speechRecognitionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -276,6 +284,36 @@ class SmartScheduleFragment : Fragment() {
         
         // TODO: Implement edit dialog similar to BottomDialogFragment
         // but for editing AI-generated todos before confirmation
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                handleLogout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun handleLogout() {
+        lifecycleScope.launch {
+            val repo = AuthRepositoryImpl(requireContext())
+            val sessionManager = SessionManager(requireContext())
+            val success = repo.logout()
+            if (success) {
+                sessionManager.clearSession()
+                Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_smartScheduleFragment_to_loginFragment)
+            } else {
+                Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -2,11 +2,16 @@ package com.example.noteapp.fragment
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.noteapp.R
+import com.example.noteapp.auth.AuthRepositoryImpl
+import com.example.noteapp.auth.SessionManager
+import kotlinx.coroutines.launch
 import com.example.noteapp.databinding.FragmentStatisticsBinding
 import com.example.noteapp.viewmodel.StatisticsViewModel
 import com.github.mikephil.charting.components.XAxis
@@ -24,6 +29,11 @@ class StatisticsFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var statisticsViewModel: StatisticsViewModel
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -162,6 +172,36 @@ class StatisticsFragment : Fragment() {
         }
     }
     
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                handleLogout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun handleLogout() {
+        lifecycleScope.launch {
+            val repo = AuthRepositoryImpl(requireContext())
+            val sessionManager = SessionManager(requireContext())
+            val success = repo.logout()
+            if (success) {
+                sessionManager.clearSession()
+                Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_statisticsFragment_to_loginFragment)
+            } else {
+                Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

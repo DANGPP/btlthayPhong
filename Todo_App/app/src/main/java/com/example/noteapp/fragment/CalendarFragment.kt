@@ -3,17 +3,19 @@ package com.example.noteapp.fragment
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.noteapp.auth.AuthRepositoryImpl
+import com.example.noteapp.auth.SessionManager
+import kotlinx.coroutines.launch
 import com.example.noteapp.R
 import com.example.noteapp.adapter.CalendarTodoAdapter
 import com.example.noteapp.adapter.TimeSlotAdapter
@@ -35,6 +37,11 @@ class CalendarFragment : Fragment() {
     private lateinit var dayTaskAdapter: DayTaskAdapter
     private lateinit var timelineScheduleAdapter: TimelineScheduleAdapter
     private var selectedDate: Calendar = Calendar.getInstance()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     enum class ViewMode {
         DAY, WEEK
@@ -634,6 +641,40 @@ class CalendarFragment : Fragment() {
                     todo,
                     com.example.noteapp.model.TodoStatus.TODO
                 )
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_workspaces -> {
+                findNavController().navigate(R.id.workspaceFragment)
+                true
+            }
+            R.id.action_logout -> {
+                handleLogout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun handleLogout() {
+        lifecycleScope.launch {
+            val repo = AuthRepositoryImpl(requireContext())
+            val sessionManager = SessionManager(requireContext())
+            val success = repo.logout()
+            if (success) {
+                sessionManager.clearSession()
+                Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_calendarFragment_to_loginFragment)
+            } else {
+                Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show()
             }
         }
     }

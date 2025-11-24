@@ -3,19 +3,22 @@ package com.example.noteapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.noteapp.appwrite.AppwriteConfig
+import com.example.noteapp.appwrite.AppwriteValidator
 import com.example.noteapp.databinding.ActivityMainBinding
-import com.example.noteapp.fragment.*
 import com.jakewharton.threetenabp.AndroidThreeTen
-import io.appwrite.services.Account
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,32 +31,49 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Appwrite client
         AppwriteConfig.init(this)
-
-        // Test login Appwrite (⚠️ đổi email/password đúng với user Appwrite)
-//        lifecycleScope.launch {
-//            try {
-//                val client = AppwriteConfig.getClient(this@MainActivity)
-//                val account = Account(client)
-//                account.createEmailPasswordSession("dangthbm2k4@gmail.com", "Dang@@211204")
-//                val user = account.get()
-//                Log.d("AuthService", "✅ Đăng nhập thành công: ${user.name} (${user.email})")
-//            } catch (e: Exception) {
-//                Log.e("AuthService", "❌ Lỗi đăng nhập: ${e.message}")
-//            }
-//        }
+        
+        // Validate Appwrite configuration (only in debug mode)
+        if (BuildConfig.DEBUG) {
+            lifecycleScope.launch {
+                AppwriteValidator(this@MainActivity).quickValidate()
+            }
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupBottomNavigation()
+        // Setup Toolbar
+        setSupportActionBar(binding.toolbar)
 
-        if (savedInstanceState == null) {
-            loadFragment(CalendarFragment())
+        // Setup Navigation
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        setupBottomNavigation()
+        
+        // Hide/show bottom navigation and toolbar based on destination
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.splashFragment,
+                R.id.loginFragment,
+                R.id.registerFragment,
+                R.id.addNoteFragment,
+                R.id.editNoteFragment,
+                R.id.showNoteFragment,
+                R.id.searchViewFragment -> {
+                    binding.bottomNavigation.visibility = View.GONE
+                    binding.toolbar.visibility = View.GONE
+                }
+                else -> {
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                    binding.toolbar.visibility = View.VISIBLE
+                }
+            }
         }
     }
 
     private fun setupImmersiveMode() {
-        supportActionBar?.hide()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = android.graphics.Color.TRANSPARENT
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
@@ -66,20 +86,28 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_statistics -> { loadFragment(StatisticsFragment()); true }
-                R.id.nav_profile -> { loadFragment(ProfileFragment()); true }
-                R.id.nav_calendar -> { loadFragment(CalendarFragment()); true }
-                R.id.nav_pomodoro -> { loadFragment(PomodoroFragment()); true }
-                R.id.nav_ai_schedule -> { loadFragment(SmartScheduleFragment()); true }
+                R.id.nav_todo -> {
+                    navController.navigate(R.id.toDoFragment)
+                    true
+                }
+                R.id.nav_calendar -> {
+                    navController.navigate(R.id.calendarFragment)
+                    true
+                }
+                R.id.nav_pomodoro -> {
+                    navController.navigate(R.id.pomodoroFragment)
+                    true
+                }
+                R.id.nav_ai_schedule -> {
+                    navController.navigate(R.id.smartScheduleFragment)
+                    true
+                }
+                R.id.nav_statistics -> {
+                    navController.navigate(R.id.statisticsFragment)
+                    true
+                }
                 else -> false
             }
         }
-        binding.bottomNavigation.selectedItemId = R.id.nav_calendar
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
     }
 }

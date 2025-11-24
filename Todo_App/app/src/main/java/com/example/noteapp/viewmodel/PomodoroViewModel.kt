@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.appwrite.AppwriteRepository
-import com.example.noteapp.appwrite.AuthService
+import com.example.noteapp.auth.SessionManager
 import com.example.noteapp.model.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -17,7 +17,7 @@ import java.util.*
 
 class PomodoroViewModel(
     private val repository: AppwriteRepository,
-    private val authService: AuthService
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     companion object {
@@ -90,15 +90,16 @@ class PomodoroViewModel(
     private fun startSession(sessionType: PomodoroSessionType, duration: Long) {
         viewModelScope.launch {
             try {
-                val currentUser = authService.getCurrentUser()
-                if (currentUser == null) {
+                // Get current user id from session manager
+                val currentUserId = sessionManager.getCurrentUserId()
+                if (currentUserId == null) {
                     _error.value = "User not authenticated"
                     return@launch
                 }
 
                 // Create new session
                 currentSession = PomodoroSession(
-                    userId = currentUser.id,
+                    userId = currentUserId,
                     sessionType = sessionType,
                     duration = duration,
                     startTime = Date(),
@@ -356,9 +357,9 @@ class PomodoroViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(PomodoroViewModel::class.java)) {
                 val repository = AppwriteRepository(context)
-                val authService = AuthService(context)
+                val sessionManager = SessionManager(context.applicationContext)
                 @Suppress("UNCHECKED_CAST")
-                return PomodoroViewModel(repository, authService) as T
+                return PomodoroViewModel(repository, sessionManager) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

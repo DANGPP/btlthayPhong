@@ -3,8 +3,6 @@ package com.example.noteapp.appwrite
 import android.content.Context
 import io.appwrite.ID
 import io.appwrite.exceptions.AppwriteException
-import io.appwrite.models.Log
-import io.appwrite.models.Session
 import io.appwrite.models.User
 import io.appwrite.services.Account
 
@@ -16,17 +14,28 @@ class AuthService(private val context: Context) {
         account = AppwriteConfig.account
     }
 
-    // Register new user
+    // Register new user and automatically login
     suspend fun register(email: String, password: String, name: String): AuthResult {
         return try {
-            val user = account.create(
+            // First, create the user account
+            account.create(
                 userId = ID.unique(),
                 email = email,
                 password = password,
                 name = name
             )
+            
+            // Then automatically login to create a session
+            account.createEmailPasswordSession(
+                email = email,
+                password = password
+            )
+            
+            // Get the logged in user data
+            val user = account.get()
             AuthResult.Success(user)
         } catch (e: AppwriteException) {
+            // Map Appwrite exception message
             AuthResult.Error(e.message ?: "Registration failed")
         } catch (e: Exception) {
             AuthResult.Error("Registration failed")
@@ -36,18 +45,17 @@ class AuthService(private val context: Context) {
     // Login user
     suspend fun login(email: String, password: String): AuthResult {
         return try {
-            android.util.Log.e("AuthService", "Attempting login for email: $email")
-            val session = account.createEmailPasswordSession(
+            // Avoid logging sensitive data like full email/password in production
+            account.createEmailPasswordSession(
                 email = email,
                 password = password
             )
             val user = account.get()
             AuthResult.Success(user)
         } catch (e: AppwriteException) {
-            android.util.Log.e("AuthService", "Login failed: ${e.message}", e)
+            // Do not expose internal details to logs in production; return user-friendly message
             AuthResult.Error(e.message ?: "Login failed")
         } catch (e: Exception) {
-            android.util.Log.e("AuthService", "Login failed: ${e.message}", e)
             AuthResult.Error("Login failed")
         }
     }
@@ -72,7 +80,7 @@ class AuthService(private val context: Context) {
                 // Ignore if no sessions to delete
             }
 
-            val session = account.createEmailPasswordSession(
+            account.createEmailPasswordSession(
                 email = email,
                 password = password
             )
@@ -98,13 +106,10 @@ class AuthService(private val context: Context) {
     // Get current user
     suspend fun getCurrentUser(): User<Map<String, Any>>? {
         return try {
-            android.util.Log.d("AuthService", "Fetching current user")
             val user = account.get()
-            android.util.Log.d("AuthService", "Current user fetched successfully")
             user
         } catch (e: Exception) {
-           android.util.Log.e("AuthService", "Error fetching current user: ${e.message}, Exception Type: ${e::class.java.name}", e)
-            null
+           null
         }
     }
 

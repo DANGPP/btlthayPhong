@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.appwrite.AppwriteRepository
-import com.example.noteapp.appwrite.AuthService
+import com.example.noteapp.auth.SessionManager
 import com.example.noteapp.model.ToDo
 import com.example.noteapp.model.TodoStatus
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ import java.util.*
 
 class CalendarViewModel(
     private val repository: AppwriteRepository,
-    private val authService: AuthService
+    private val sessionManager: SessionManager
 ) : ViewModel() {
     
     companion object {
@@ -58,13 +58,13 @@ class CalendarViewModel(
                 _isLoading.value = true
                 Log.d(TAG, "Loading todos for date: $dateString")
                 
-                val currentUser = authService.getCurrentUser()
-                if (currentUser == null) {
+                val userId = sessionManager.getCurrentUserId()
+                if (userId == null) {
                     _error.value = "User not authenticated"
                     return@launch
                 }
                 
-                val allTodos = repository.getAllTodosByUserId(currentUser.id)
+                val allTodos = repository.getAllTodosByUserId(userId)
                 val todosForDate = allTodos.filter { todo ->
                     // Extract date parts and compare
                     val createdDate = extractDateFromDateTime(todo.createdTime)
@@ -94,13 +94,13 @@ class CalendarViewModel(
                 _isLoading.value = true
                 Log.d(TAG, "Loading todos for date range: $startDate to $endDate")
                 
-                val currentUser = authService.getCurrentUser()
-                if (currentUser == null) {
+                val userId = sessionManager.getCurrentUserId()
+                if (userId == null) {
                     _error.value = "User not authenticated"
                     return@launch
                 }
                 
-                val allTodos = repository.getAllTodosByUserId(currentUser.id)
+                val allTodos = repository.getAllTodosByUserId(userId)
                 val todosInRange = allTodos.filter { todo ->
                     val createdDate = extractDateFromDateTime(todo.createdTime)
                     val dueDate = extractDateFromDateTime(todo.dueTime)
@@ -159,8 +159,8 @@ class CalendarViewModel(
         
         viewModelScope.launch {
             try {
-                val currentUser = authService.getCurrentUser()
-                if (currentUser == null) {
+                val userId = sessionManager.getCurrentUserId()
+                if (userId == null) {
                     _error.value = "User not authenticated"
                     return@launch
                 }
@@ -174,7 +174,7 @@ class CalendarViewModel(
                 // Get todos for each day of the week
                 for (i in 0..6) {
                     val dayString = dateFormatter.format(calendar.time)
-                    val allTodos = repository.getAllTodosByUserId(currentUser.id)
+                    val allTodos = repository.getAllTodosByUserId(userId)
                     val dayTodos = allTodos.filter { todo ->
                         val createdDate = extractDateFromDateTime(todo.createdTime)
                         val dueDate = extractDateFromDateTime(todo.dueTime)
@@ -202,13 +202,13 @@ class CalendarViewModel(
         
         viewModelScope.launch {
             try {
-                val currentUser = authService.getCurrentUser()
-                if (currentUser == null) {
+                val userId = sessionManager.getCurrentUserId()
+                if (userId == null) {
                     _error.value = "User not authenticated"
                     return@launch
                 }
                 
-                val allTodos = repository.getAllTodosByUserId(currentUser.id)
+                val allTodos = repository.getAllTodosByUserId(userId)
                 val monthMap = mutableMapOf<String, List<ToDo>>()
                 
                 allTodos.forEach { todo ->
@@ -272,9 +272,9 @@ class CalendarViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(CalendarViewModel::class.java)) {
                 val repository = AppwriteRepository(context)
-                val authService = AuthService(context)
+                val sessionManager = SessionManager(context.applicationContext)
                 @Suppress("UNCHECKED_CAST")
-                return CalendarViewModel(repository, authService) as T
+                return CalendarViewModel(repository, sessionManager) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

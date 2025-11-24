@@ -3,7 +3,6 @@ package com.example.noteapp.fragment
 
 
 
-
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +18,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -33,7 +31,6 @@ import com.example.noteapp.R
 import com.example.noteapp.adapter.NoteAdapter
 import com.example.noteapp.adapter.PagerAdapter
 import com.example.noteapp.adapter.ToDoAdapter
-import com.example.noteapp.appwrite.AuthService
 import com.example.noteapp.databinding.FragmentHomeBinding
 import com.example.noteapp.model.Note
 import com.example.noteapp.model.ToDo
@@ -44,6 +41,8 @@ import com.google.android.material.tabs.TabLayout
 import java.util.Timer
 import kotlin.concurrent.timerTask
 import org.owasp.encoder.Encode
+import com.example.noteapp.auth.AuthRepositoryImpl
+import com.example.noteapp.auth.SessionManager
 
 
 class HomeFragment : Fragment() {
@@ -56,7 +55,6 @@ class HomeFragment : Fragment() {
     private  var linearLayoutBoolean: Boolean = false
     private var isAscending: Boolean = true
     private var showFabButton : Boolean = false
-    private lateinit var authService: AuthService
 
     private val noteViewModel: NoteViewModel by lazy {
         ViewModelProvider(this, NoteViewModel.NoteViewModelFactory(requireContext()))[NoteViewModel::class.java]
@@ -72,7 +70,6 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        authService = AuthService(requireContext())
     }
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_home,menu)
@@ -119,12 +116,6 @@ class HomeFragment : Fragment() {
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
 
-            }
-        })
-        viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                tabLayout.selectTab(tabLayout.getTabAt(position))
             }
         })
         return binding.root
@@ -190,11 +181,14 @@ class HomeFragment : Fragment() {
 
         return true
     }
-    
+
     private fun handleLogout() {
         lifecycleScope.launch {
-            val success = authService.logout()
+            val repo = AuthRepositoryImpl(requireContext())
+            val success = repo.logout()
+            val sessionManager = SessionManager(requireContext())
             if (success) {
+                sessionManager.clearSession()
                 Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
             } else {
@@ -205,3 +199,197 @@ class HomeFragment : Fragment() {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

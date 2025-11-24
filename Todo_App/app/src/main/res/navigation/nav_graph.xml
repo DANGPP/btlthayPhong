@@ -87,8 +87,8 @@
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" >
         <action
-            android:id="@+id/action_splashFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            android:id="@+id/action_splashFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment" />
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -102,8 +102,8 @@
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
         <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
+            android:id="@+id/action_loginFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
@@ -116,15 +116,83 @@
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_registerFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
+            android:id="@+id/action_registerFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
+    
+    <!-- Main App Fragments -->
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.example.noteapp.fragment.CalendarFragment"
+        android:label="Calendar"
+        tools:layout="@layout/fragment_calendar" >
+        <action
+            android:id="@+id/action_calendarFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/toDoFragment"
+        android:name="com.example.noteapp.fragment.ToDoFragment"
+        android:label="Todo"
+        tools:layout="@layout/fragment_to_do" >
+        <action
+            android:id="@+id/action_toDoFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
     <fragment
         android:id="@+id/pomodoroFragment"
         android:name="com.example.noteapp.fragment.PomodoroFragment"
-        android:label="Pomodoro Timer"
-        tools:layout="@layout/fragment_pomodoro" />
+        android:label="Pomodoro"
+        tools:layout="@layout/fragment_pomodoro" >
+        <action
+            android:id="@+id/action_pomodoroFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/smartScheduleFragment"
+        android:name="com.example.noteapp.fragment.SmartScheduleFragment"
+        android:label="AI Schedule"
+        tools:layout="@layout/fragment_smart_schedule" >
+        <action
+            android:id="@+id/action_smartScheduleFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.noteapp.fragment.StatisticsFragment"
+        android:label="Statistics"
+        tools:layout="@layout/fragment_statistics" >
+        <action
+            android:id="@+id/action_statisticsFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/workspaceFragment"
+        android:name="com.example.noteapp.ui.WorkspaceFragment"
+        android:label="Workspaces"
+        tools:layout="@layout/fragment_workspace" >
+        <action
+            android:id="@+id/action_workspaceFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

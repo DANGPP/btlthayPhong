@@ -5,9 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentManager
@@ -15,10 +13,14 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.noteapp.auth.AuthRepositoryImpl
+import com.example.noteapp.auth.SessionManager
+import kotlinx.coroutines.launch
 import com.example.noteapp.R
 import com.example.noteapp.adapter.ToDoAdapter
 import com.example.noteapp.databinding.FragmentToDoBinding
@@ -44,6 +46,12 @@ class ToDoFragment : Fragment() {
         Log.d("ToDoFragment", "ToDoFragment using ViewModel instance: ${vm.hashCode()}")
         vm
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -100,8 +108,8 @@ class ToDoFragment : Fragment() {
         // Observe redirect to login
         toDoViewModel.shouldRedirectToLogin.observe(viewLifecycleOwner, Observer { shouldRedirect ->
             if (shouldRedirect) {
-                // Navigate to login screen via HomeFragment
-                findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+                // Navigate to login screen
+                findNavController().navigate(R.id.action_toDoFragment_to_loginFragment)
                 toDoViewModel.clearRedirectToLogin()
             }
         })
@@ -132,6 +140,40 @@ class ToDoFragment : Fragment() {
             toDoViewModel.markTodoIncomplete(it)
         } else {
             toDoViewModel.markTodoCompleted(it)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_workspaces -> {
+                findNavController().navigate(R.id.workspaceFragment)
+                true
+            }
+            R.id.action_logout -> {
+                handleLogout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun handleLogout() {
+        lifecycleScope.launch {
+            val repo = AuthRepositoryImpl(requireContext())
+            val sessionManager = SessionManager(requireContext())
+            val success = repo.logout()
+            if (success) {
+                sessionManager.clearSession()
+                Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_toDoFragment_to_loginFragment)
+            } else {
+                Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

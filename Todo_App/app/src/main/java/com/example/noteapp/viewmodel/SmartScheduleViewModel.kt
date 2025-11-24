@@ -7,11 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.appwrite.AppwriteRepository
-import com.example.noteapp.appwrite.AuthService
 import com.example.noteapp.model.ToDo
 import com.example.noteapp.service.AIService
 import com.example.noteapp.service.AIServiceFactory
 import com.example.noteapp.service.AITodoRequest
+import com.example.noteapp.auth.SessionManager
 
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -19,10 +19,10 @@ import java.util.*
 
 class SmartScheduleViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val repository = AppwriteRepository(application)
-    private val authService = AuthService(application)
-    private val aiServiceFactory = AIServiceFactory(application)
-    
+    private val repository = AppwriteRepository(application.applicationContext)
+    private val sessionManager = SessionManager(application.applicationContext)
+    private val aiServiceFactory = AIServiceFactory(application.applicationContext)
+
     // LiveData for UI state
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -65,8 +65,8 @@ class SmartScheduleViewModel(application: Application) : AndroidViewModel(applic
                 _errorMessage.value = ""
                 
                 // Check if user is authenticated
-                val currentUser = authService.getCurrentUser()
-                if (currentUser == null) {
+                val currentUserId = sessionManager.getCurrentUserId()
+                if (currentUserId == null) {
                     _errorMessage.value = "Please log in to use AI features"
                     return@launch
                 }
@@ -82,7 +82,7 @@ class SmartScheduleViewModel(application: Application) : AndroidViewModel(applic
                 val currentTime = getCurrentTimeISO()
                 val request = AITodoRequest(
                     prompt = prompt,
-                    userId = currentUser.id,
+                    userId = currentUserId,
                     currentTime = currentTime
                 )
                 Log.d("SmartScheduleViewModel", "AI Request: $request")
@@ -95,8 +95,8 @@ class SmartScheduleViewModel(application: Application) : AndroidViewModel(applic
                     _generatedTodos.value = response.todos
                     
                     // Check for scheduling conflicts
-                    checkForConflicts(currentUser.id, response.todos)
-                    
+                    checkForConflicts(currentUserId, response.todos)
+
                     _successMessage.value = ""
                 } else {
                     _errorMessage.value = response.error ?: "Failed to generate todos. Please try a different prompt."
@@ -119,6 +119,7 @@ class SmartScheduleViewModel(application: Application) : AndroidViewModel(applic
             _conflictingTodos.value = conflicts
             
             if (conflicts.isNotEmpty()) {
+                // keep them for confirmation step
                 _errorMessage.value = "Warning: ${conflicts.size} task(s) may have scheduling conflicts"
             }
         } catch (e: Exception) {

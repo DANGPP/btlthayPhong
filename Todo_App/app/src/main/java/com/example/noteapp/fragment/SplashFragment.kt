@@ -10,20 +10,18 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.noteapp.R
-import com.example.noteapp.appwrite.AuthService
+import com.example.noteapp.auth.AuthRepositoryImpl
 import kotlinx.coroutines.launch
 
 
 class SplashFragment : Fragment() {
-    
-    private lateinit var authService: AuthService
+
+    // don't keep a long-lived reference to context-bound services
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        authService = AuthService(requireContext())
-        
         Handler(Looper.myLooper()!!).postDelayed(
             {
                 checkAuthenticationAndNavigate()
@@ -32,12 +30,13 @@ class SplashFragment : Fragment() {
 
         return inflater.inflate(R.layout.fragment_splash, container, false)
     }
-    
+
     private fun checkAuthenticationAndNavigate() {
         lifecycleScope.launch {
-            if (authService.isLoggedIn()) {
-                // User is logged in, navigate to home
-                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+            val repo = AuthRepositoryImpl(requireContext())
+            if (repo.isLoggedIn()) {
+                // User is logged in, navigate to calendar
+                findNavController().navigate(R.id.action_splashFragment_to_calendarFragment)
             } else {
                 // User is not logged in, navigate to login
                 findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
