@@ -182,7 +182,9 @@ class DayTimelineAdapter(
         return when (status) {
             TodoStatus.TODO -> ContextCompat.getColor(context, R.color.status_todo)
             TodoStatus.IN_PROGRESS -> ContextCompat.getColor(context, R.color.status_in_progress)
+            TodoStatus.IN_REVIEW -> ContextCompat.getColor(context, R.color.status_in_progress)
             TodoStatus.COMPLETED -> ContextCompat.getColor(context, R.color.status_completed)
+            TodoStatus.DONE -> ContextCompat.getColor(context, R.color.status_completed)
             else -> ContextCompat.getColor(context, R.color.status_todo)
         }
     }

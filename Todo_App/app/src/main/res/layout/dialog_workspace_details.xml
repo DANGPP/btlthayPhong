@@ -14,7 +14,7 @@
             android:id="@+id/textViewWorkspaceName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Workspace Name"
+            android:text="Tên Không Gian"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -22,23 +22,31 @@
             android:id="@+id/textViewWorkspaceDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Description"
+            android:text="Mô tả"
             android:textSize="14sp"
             android:layout_marginTop="8dp"
             android:textColor="?android:attr/textColorSecondary" />
+
+        <Button
+            android:id="@+id/buttonViewBoard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Xem Bảng Công Việc"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.MaterialComponents.Button" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp">
 
             <Button
                 android:id="@+id/buttonInviteMember"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Invite Member"
+                android:text="Mời Thành Viên"
                 android:layout_marginEnd="8dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -47,7 +55,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Edit"
+                android:text="Chỉnh Sửa"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
         </LinearLayout>
@@ -56,7 +64,7 @@
             android:id="@+id/textViewMemberCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Members (0)"
+            android:text="Thành Viên (0)"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="24dp"
@@ -72,7 +80,7 @@
             android:id="@+id/textViewEmptyMembers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No members yet"
+            android:text="Chưa có thành viên"
             android:textAlignment="center"
             android:padding="16dp"
             android:visibility="gone"

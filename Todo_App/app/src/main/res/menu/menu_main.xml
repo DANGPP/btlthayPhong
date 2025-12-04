@@ -4,13 +4,13 @@
     
     <item
         android:id="@+id/action_workspaces"
-        android:title="Workspaces"
+        android:title="Không Gian Làm Việc"
         android:icon="@android:drawable/ic_menu_view"
         app:showAsAction="never"/>
     
     <item
         android:id="@+id/action_logout"
-        android:title="Logout"
+        android:title="Đăng Xuất"
         android:icon="@android:drawable/ic_lock_power_off"
         app:showAsAction="never"/>
         

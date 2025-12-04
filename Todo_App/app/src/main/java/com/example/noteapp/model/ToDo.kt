@@ -70,6 +70,8 @@ data class ToDo(
 enum class TodoStatus(val value: String, val displayName: String, val colorRes: Int) {
     TODO("to_do", "To Do", R.color.status_todo),
     IN_PROGRESS("in_progress", "In Progress", R.color.status_in_progress),
+    IN_REVIEW("in_review", "In Review", R.color.status_in_progress),
+    DONE("done", "Done", R.color.status_completed),
     COMPLETED("completed", "Completed", R.color.status_completed),
     CANCELLED("cancelled", "Cancelled", R.color.status_cancelled),
     ON_HOLD("on_hold", "On Hold", R.color.status_on_hold);
@@ -79,6 +81,24 @@ enum class TodoStatus(val value: String, val displayName: String, val colorRes: 
             return values().find { it.value == value } ?: TODO
         }
     }
+    
+    // Map to board columns
+    fun toBoardColumn(): BoardColumn {
+        return when(this) {
+            TODO -> BoardColumn.TODO
+            IN_PROGRESS -> BoardColumn.IN_PROGRESS
+            IN_REVIEW -> BoardColumn.IN_REVIEW
+            DONE, COMPLETED -> BoardColumn.DONE
+            else -> BoardColumn.TODO
+        }
+    }
+}
+
+enum class BoardColumn(val displayName: String, val status: List<TodoStatus>) {
+    TODO("CẦN LÀM", listOf(TodoStatus.TODO)),
+    IN_PROGRESS("ĐANG LÀM", listOf(TodoStatus.IN_PROGRESS)),
+    IN_REVIEW("ĐANG REVIEW", listOf(TodoStatus.IN_REVIEW)),
+    DONE("HOÀN THÀNH", listOf(TodoStatus.DONE, TodoStatus.COMPLETED))
 }
 
 enum class TodoPriority(val value: String, val displayName: String) {

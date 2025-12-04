@@ -97,9 +97,9 @@ class WorkspaceFragment : Fragment() {
             if (invitations.isNotEmpty()) {
                 Snackbar.make(
                     binding.root,
-                    "You have ${invitations.size} pending invitation(s). Check menu → Invitations",
+                    "Bạn có ${invitations.size} lời mời chờ xử lý. Kiểm tra menu → Lời Mời",
                     Snackbar.LENGTH_LONG
-                ).setAction("View") {
+                ).setAction("Xem") {
                     showInvitationsDialog()
                 }.show()
             }
@@ -118,19 +118,19 @@ class WorkspaceFragment : Fragment() {
         val descInput = dialogView.findViewById<TextInputEditText>(R.id.editTextWorkspaceDescription)
         
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Create Workspace")
+            .setTitle("Tạo Không Gian Làm Việc")
             .setView(dialogView)
-            .setPositiveButton("Create") { _, _ ->
+            .setPositiveButton("Tạo") { _, _ ->
                 val name = nameInput.text.toString().trim()
                 val description = descInput.text.toString().trim()
                 
                 if (name.isNotEmpty()) {
                     viewModel.createWorkspace(name, description)
                 } else {
-                    Snackbar.make(binding.root, "Name required", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "Vui lòng nhập tên", Snackbar.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Hủy", null)
             .show()
     }
     
@@ -141,12 +141,12 @@ class WorkspaceFragment : Fragment() {
     
     private fun confirmDeleteWorkspace(workspaceId: String, workspaceName: String) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete Workspace")
-            .setMessage("Are you sure you want to delete \"$workspaceName\"? This cannot be undone.")
-            .setPositiveButton("Delete") { _, _ ->
+            .setTitle("Xóa Không Gian")
+            .setMessage("Bạn có chắc chắn muốn xóa \"$workspaceName\"? Hành động này không thể hoàn tác.")
+            .setPositiveButton("Xóa") { _, _ ->
                 viewModel.deleteWorkspace(workspaceId)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Hủy", null)
             .show()
     }
     

@@ -193,6 +193,19 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_workspaceDetails_to_workspaceBoard"
+            app:destination="@id/workspaceBoardFragment" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/workspaceBoardFragment"
+        android:name="com.example.noteapp.ui.WorkspaceBoardFragment"
+        android:label="Board View"
+        tools:layout="@layout/fragment_workspace_board" >
+        <argument
+            android:name="workspaceId"
+            app:argType="string" />
     </fragment>
 
 </navigation>

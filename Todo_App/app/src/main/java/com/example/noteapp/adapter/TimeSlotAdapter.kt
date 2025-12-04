@@ -54,7 +54,9 @@ class TimeSlotAdapter(
                     val indicatorColor = when (task.status) {
                         TodoStatus.COMPLETED -> com.example.noteapp.R.color.status_completed
                         TodoStatus.IN_PROGRESS -> com.example.noteapp.R.color.status_in_progress
+                        TodoStatus.IN_REVIEW -> com.example.noteapp.R.color.status_in_progress
                         TodoStatus.TODO -> com.example.noteapp.R.color.status_todo
+                        TodoStatus.DONE -> com.example.noteapp.R.color.status_completed
                         TodoStatus.ON_HOLD -> com.example.noteapp.R.color.status_on_hold
                         TodoStatus.CANCELLED -> com.example.noteapp.R.color.status_cancelled
                     }

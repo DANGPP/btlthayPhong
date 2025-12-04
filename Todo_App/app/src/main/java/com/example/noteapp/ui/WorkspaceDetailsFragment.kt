@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteapp.databinding.DialogWorkspaceDetailsBinding
 import com.example.noteapp.model.WorkspaceRole
@@ -82,7 +83,7 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         viewModel.currentWorkspace.observe(viewLifecycleOwner) { workspace ->
             workspace?.let {
                 binding.textViewWorkspaceName.text = it.name
-                binding.textViewWorkspaceDescription.text = it.description.ifEmpty { "No description" }
+                binding.textViewWorkspaceDescription.text = it.description.ifEmpty { "Không có mô tả" }
                 
                 // Check if current user is owner - always show buttons for owner
                 val sessionManager = com.example.noteapp.auth.SessionManager(requireContext())
@@ -98,7 +99,7 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         
         viewModel.members.observe(viewLifecycleOwner) { members ->
             memberAdapter.submitList(members)
-            binding.textViewMemberCount.text = "Members (${members.size})"
+            binding.textViewMemberCount.text = "Thành Viên (${members.size})"
             
             if (members.isEmpty()) {
                 binding.recyclerViewMembers.visibility = View.GONE
@@ -139,6 +140,10 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
     }
     
     private fun setupListeners() {
+        binding.buttonViewBoard.setOnClickListener {
+            openBoardView()
+        }
+        
         binding.buttonInviteMember.setOnClickListener {
             showInviteMemberDialog()
         }
@@ -148,16 +153,26 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         }
     }
     
+    private fun openBoardView() {
+        workspaceId?.let { id ->
+            val bundle = Bundle().apply {
+                putString("workspaceId", id)
+            }
+            findNavController().navigate(R.id.action_workspaceDetails_to_workspaceBoard, bundle)
+            dismiss()
+        }
+    }
+    
     private fun showInviteMemberDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_invite_member, null)
         val emailInput = dialogView.findViewById<TextInputEditText>(R.id.editTextInviteEmail)
         val roleGroup = dialogView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupRole)
         
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Invite Member")
-            .setMessage("Enter the exact email address the user registered with. They will see the invitation in Menu → Invitations.")
+            .setTitle("Mời Thành Viên")
+            .setMessage("Nhập chính xác địa chỉ email mà người dùng đã đăng ký. Họ sẽ thấy lời mời trong Menu → Lời Mời.")
             .setView(dialogView)
-            .setPositiveButton("Send Invitation") { _, _ ->
+            .setPositiveButton("Gửi Lời Mời") { _, _ ->
                 val email = emailInput.text.toString().trim()
                 val role = when (roleGroup.checkedChipId) {
                     R.id.chipAdmin -> WorkspaceRole.ADMIN
@@ -168,10 +183,10 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
                 if (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     workspaceId?.let { viewModel.inviteMember(it, email, role) }
                 } else {
-                    Snackbar.make(binding.root, "Invalid email", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "Email không hợp lệ", Snackbar.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Hủy", null)
             .show()
     }
     
@@ -186,19 +201,19 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         descInput.setText(workspace.description)
         
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Edit Workspace")
+            .setTitle("Chỉnh Sửa Không Gian")
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("Lưu") { _, _ ->
                 val name = nameInput.text.toString().trim()
                 val description = descInput.text.toString().trim()
                 
                 if (name.isNotEmpty()) {
                     viewModel.updateWorkspace(workspace.id, name, description)
                 } else {
-                    Snackbar.make(binding.root, "Name required", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "Vui lòng nhập tên", Snackbar.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Hủy", null)
             .show()
     }
     
@@ -208,23 +223,23 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         val currentIndex = roles.indexOf(currentRole)
         
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Change Role")
+            .setTitle("Đổi Vai Trò")
             .setSingleChoiceItems(roleNames, currentIndex) { dialog, which ->
                 viewModel.updateMemberRole(memberId, roles[which])
                 dialog.dismiss()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Hủy", null)
             .show()
     }
     
     private fun confirmRemoveMember(memberId: String, userEmail: String) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Remove Member")
-            .setMessage("Remove $userEmail from this workspace?")
-            .setPositiveButton("Remove") { _, _ ->
+            .setTitle("Xóa Thành Viên")
+            .setMessage("Xóa $userEmail khỏi không gian này?")
+            .setPositiveButton("Xóa") { _, _ ->
                 viewModel.removeMember(memberId)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Hủy", null)
             .show()
     }
     

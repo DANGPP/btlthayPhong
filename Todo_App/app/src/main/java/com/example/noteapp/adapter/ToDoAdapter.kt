@@ -136,7 +136,9 @@ class ToDoAdapter(
                 val (iconRes, actionText) = when (status) {
                     TodoStatus.TODO -> Pair(R.drawable.ic_play_arrow, "Start")
                     TodoStatus.IN_PROGRESS -> Pair(R.drawable.ic_check, "Complete")
+                    TodoStatus.IN_REVIEW -> Pair(R.drawable.ic_check, "Done")
                     TodoStatus.COMPLETED -> Pair(R.drawable.ic_refresh, "Reopen")
+                    TodoStatus.DONE -> Pair(R.drawable.ic_refresh, "Reopen")
                     TodoStatus.ON_HOLD -> Pair(R.drawable.ic_play_arrow, "Resume")
                     TodoStatus.CANCELLED -> Pair(R.drawable.ic_refresh, "Reopen")
                 }

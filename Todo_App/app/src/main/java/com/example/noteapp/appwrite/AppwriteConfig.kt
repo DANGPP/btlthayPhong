@@ -16,10 +16,11 @@ object AppwriteConfig {
     // Go to your Appwrite console -> Database -> Collections and copy the actual IDs
     const val USER_COLLECTION_ID = "users" // Replace with actual collection ID
     const val NOTE_COLLECTION_ID = "notes" // Replace with actual collection ID  
-    const val TODO_COLLECTION_ID = "todos" // Replace with actual collection ID
+    const val TODO_COLLECTION_ID = "todos" // Replace with actual collection ID - Personal tasks only
     const val WORKSPACE_COLLECTION_ID = "workspaces" // Replace with actual collection ID
     const val WORKSPACE_MEMBER_COLLECTION_ID = "workspace_members" // Replace with actual collection ID
     const val WORKSPACE_INVITATION_COLLECTION_ID = "workspace_invitations" // Replace with actual collection ID
+    const val WORKSPACE_TASK_COLLECTION_ID = "workspace_tasks" // NEW: Separate collection for workspace tasks
 
     lateinit var client: Client
     lateinit var account: Account

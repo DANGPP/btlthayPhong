@@ -156,8 +156,10 @@ class CalendarFragment : Fragment() {
                 // Handle status toggle - cycle through statuses
                 val newStatus = when (todo.status) {
                     TodoStatus.TODO -> TodoStatus.IN_PROGRESS
-                    TodoStatus.IN_PROGRESS -> TodoStatus.COMPLETED
+                    TodoStatus.IN_PROGRESS -> TodoStatus.IN_REVIEW
+                    TodoStatus.IN_REVIEW -> TodoStatus.DONE
                     TodoStatus.COMPLETED -> TodoStatus.TODO
+                    TodoStatus.DONE -> TodoStatus.TODO
                     TodoStatus.CANCELLED -> TodoStatus.TODO
                     TodoStatus.ON_HOLD -> TodoStatus.IN_PROGRESS
                 }

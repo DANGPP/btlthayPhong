@@ -72,7 +72,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="All Day"
+        android:text="Cả Ngày"
         android:textColor="#1A1A1A"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -155,7 +155,7 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
-            android:contentDescription="Previous Week" />
+            android:contentDescription="Tuần Trước" />
 
         <TextView
             android:id="@+id/text_week_range"
@@ -174,7 +174,7 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_right"
-            android:contentDescription="Next Week" />
+            android:contentDescription="Tuần Sau" />
 
     </LinearLayout>
 

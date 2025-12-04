@@ -4,13 +4,13 @@
     
     <item
         android:id="@+id/action_invitations"
-        android:title="Invitations"
+        android:title="Lời Mời"
         android:icon="@android:drawable/ic_menu_send"
         app:showAsAction="ifRoom" />
     
     <item
         android:id="@+id/action_refresh"
-        android:title="Refresh"
+        android:title="Làm Mới"
         android:icon="@android:drawable/ic_menu_rotate"
         app:showAsAction="ifRoom" />
     

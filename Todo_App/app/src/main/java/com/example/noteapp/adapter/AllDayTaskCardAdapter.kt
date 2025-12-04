@@ -144,7 +144,9 @@ class AllDayTaskCardAdapter(
             val (bgColor, textColor) = when (status) {
                 TodoStatus.TODO -> Pair("#E3F2FD", "#1976D2") // Blue
                 TodoStatus.IN_PROGRESS -> Pair("#FFF3E0", "#F57C00") // Orange
+                TodoStatus.IN_REVIEW -> Pair("#F3E5F5", "#7B1FA2") // Purple
                 TodoStatus.COMPLETED -> Pair("#E8F5E8", "#388E3C") // Green
+                TodoStatus.DONE -> Pair("#E8F5E8", "#388E3C") // Green (same as completed)
                 TodoStatus.ON_HOLD -> Pair("#F5F5F5", "#757575") // Grey
                 TodoStatus.CANCELLED -> Pair("#FFEBEE", "#D32F2F") // Red
             }

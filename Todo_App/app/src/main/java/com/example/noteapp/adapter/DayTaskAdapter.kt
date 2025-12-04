@@ -192,7 +192,9 @@ class DayTaskAdapter(
             val (indicatorColor, iconRes, iconTint) = when (status) {
                 TodoStatus.TODO -> Triple("#2196F3", R.drawable.ic_schedule, "#999999")
                 TodoStatus.IN_PROGRESS -> Triple("#FF9800", R.drawable.ic_play_arrow, "#FF9800")
+                TodoStatus.IN_REVIEW -> Triple("#9C27B0", R.drawable.ic_check, "#9C27B0")
                 TodoStatus.COMPLETED -> Triple("#4CAF50", R.drawable.ic_check_circle, "#4CAF50")
+                TodoStatus.DONE -> Triple("#4CAF50", R.drawable.ic_check_circle, "#4CAF50")
                 TodoStatus.ON_HOLD -> Triple("#9E9E9E", R.drawable.ic_pause, "#9E9E9E")
                 TodoStatus.CANCELLED -> Triple("#607D8B", R.drawable.baseline_radio_button_unchecked_24, "#607D8B")
             }
