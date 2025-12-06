@@ -5,9 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteapp.databinding.DialogWorkspaceDetailsBinding
+import com.example.noteapp.model.WorkspaceMember
 import com.example.noteapp.model.WorkspaceRole
 import com.example.noteapp.viewmodel.WorkspaceViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -15,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.example.noteapp.R
+import kotlinx.coroutines.launch
 
 class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
     private var _binding: DialogWorkspaceDetailsBinding? = null
@@ -65,6 +69,9 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
     
     private fun setupRecyclerView() {
         memberAdapter = WorkspaceMemberAdapter(
+            onMemberClick = { member ->
+                viewMemberTasks(member)
+            },
             onRoleChangeClick = { member ->
                 showChangeRoleDialog(member.id, member.role)
             },
@@ -76,6 +83,31 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         binding.recyclerViewMembers.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = memberAdapter
+        }
+    }
+    
+    private fun viewMemberTasks(member: WorkspaceMember) {
+        workspaceId?.let { wsId ->
+            // Load user name from users collection
+            lifecycleScope.launch {
+                try {
+                    val userName = viewModel.getUserName(member.userEmail) ?: member.userEmail
+                    
+                    val bundle = Bundle().apply {
+                        putString("workspace_id", wsId)
+                        putString("user_id", member.userId)
+                        putString("user_name", userName)
+                    }
+                    
+                    // Navigate using activity's NavController
+                    androidx.navigation.Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                        .navigate(R.id.memberTasksFragment, bundle)
+                    
+                    dismiss()
+                } catch (e: Exception) {
+                    Snackbar.make(binding.root, "Không thể mở màn hình tasks: ${e.message}", Snackbar.LENGTH_SHORT).show()
+                }
+            }
         }
     }
     
@@ -111,12 +143,17 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
         }
         
         viewModel.userRole.observe(viewLifecycleOwner) { role ->
-            // Show/hide admin actions based on role (if not owner)
+            // Check if current user is owner
             val workspace = viewModel.currentWorkspace.value
             val sessionManager = com.example.noteapp.auth.SessionManager(requireContext())
             val currentUserId = sessionManager.getCurrentUserId()
             val isOwner = workspace?.ownerId == currentUserId
             
+            // Update adapter: owner always has ADMIN permissions
+            val effectiveRole = if (isOwner) WorkspaceRole.ADMIN else role
+            memberAdapter.updateCurrentUserRole(effectiveRole)
+            
+            // Show/hide admin actions based on role (if not owner)
             if (!isOwner) {
                 val canManage = role?.canManageMembers() == true
                 binding.buttonInviteMember.visibility = if (canManage) View.VISIBLE else View.GONE
@@ -156,7 +193,7 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
     private fun openBoardView() {
         workspaceId?.let { id ->
             val bundle = Bundle().apply {
-                putString("workspaceId", id)
+                putString("workspace_id", id)
             }
             findNavController().navigate(R.id.action_workspaceDetails_to_workspaceBoard, bundle)
             dismiss()
@@ -164,30 +201,80 @@ class WorkspaceDetailsFragment : BottomSheetDialogFragment() {
     }
     
     private fun showInviteMemberDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_invite_member, null)
-        val emailInput = dialogView.findViewById<TextInputEditText>(R.id.editTextInviteEmail)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_invite_member_enhanced, null)
+        val searchInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editTextSearchUser)
+        val recyclerView = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerViewUsers)
+        val emptyText = dialogView.findViewById<android.widget.TextView>(R.id.textEmptyUsers)
+        val selectedCountText = dialogView.findViewById<android.widget.TextView>(R.id.textSelectedCount)
         val roleGroup = dialogView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupRole)
         
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Mời Thành Viên")
-            .setMessage("Nhập chính xác địa chỉ email mà người dùng đã đăng ký. Họ sẽ thấy lời mời trong Menu → Lời Mời.")
-            .setView(dialogView)
-            .setPositiveButton("Gửi Lời Mời") { _, _ ->
-                val email = emailInput.text.toString().trim()
-                val role = when (roleGroup.checkedChipId) {
-                    R.id.chipAdmin -> WorkspaceRole.ADMIN
-                    R.id.chipEditor -> WorkspaceRole.EDITOR
-                    else -> WorkspaceRole.VIEWER
-                }
-                
-                if (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    workspaceId?.let { viewModel.inviteMember(it, email, role) }
-                } else {
-                    Snackbar.make(binding.root, "Email không hợp lệ", Snackbar.LENGTH_SHORT).show()
-                }
+        // Setup RecyclerView
+        lateinit var userAdapter: com.example.noteapp.adapter.UserSelectionAdapter
+        userAdapter = com.example.noteapp.adapter.UserSelectionAdapter { user, isSelected ->
+            val selectedUsers = userAdapter.getSelectedUsers()
+            selectedCountText.text = "Đã chọn: ${selectedUsers.size}"
+        }
+        
+        recyclerView.apply {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            adapter = userAdapter
+        }
+        
+        // Load available users from database (filtered by workspace)
+        workspaceId?.let { viewModel.loadAvailableUsers(it) }
+        
+        // Observe users list
+        viewModel.availableUsers.observe(viewLifecycleOwner) { users ->
+            if (users.isEmpty()) {
+                recyclerView.visibility = android.view.View.GONE
+                emptyText.visibility = android.view.View.VISIBLE
+            } else {
+                recyclerView.visibility = android.view.View.VISIBLE
+                emptyText.visibility = android.view.View.GONE
+                userAdapter.submitList(users)
             }
+        }
+        
+        // Search functionality
+        searchInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val query = s.toString().trim()
+                workspaceId?.let { viewModel.searchUsers(query, it) }
+            }
+        })
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Mời Thành Viên")
+            .setView(dialogView)
+            .setPositiveButton("Gửi Lời Mời", null)
             .setNegativeButton("Hủy", null)
-            .show()
+            .create()
+        
+        dialog.show()
+        
+        // Override positive button to prevent auto-dismiss
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val selectedUsers = userAdapter.getSelectedUsers()
+            
+            if (selectedUsers.isEmpty()) {
+                Snackbar.make(binding.root, "Vui lòng chọn ít nhất 1 người dùng", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            val role = when (roleGroup.checkedChipId) {
+                R.id.chipAdmin -> WorkspaceRole.ADMIN
+                R.id.chipEditor -> WorkspaceRole.EDITOR
+                else -> WorkspaceRole.VIEWER
+            }
+            
+            workspaceId?.let { id ->
+                viewModel.inviteMultipleUsers(id, selectedUsers, role)
+            }
+            
+            dialog.dismiss()
+        }
     }
     
     private fun showEditWorkspaceDialog() {

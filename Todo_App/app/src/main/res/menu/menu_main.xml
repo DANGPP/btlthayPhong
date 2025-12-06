@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <item
-        android:id="@+id/action_workspaces"
-        android:title="Không Gian Làm Việc"
-        android:icon="@android:drawable/ic_menu_view"
-        app:showAsAction="never"/>
+        android:id="@+id/action_notifications"
+        android:title="Thông Báo"
+        android:icon="@android:drawable/ic_popup_reminder"
+        app:showAsAction="always"
+        app:actionLayout="@layout/notification_badge_layout"/>
     
     <item
         android:id="@+id/action_logout"

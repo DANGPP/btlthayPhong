@@ -21,7 +21,7 @@
             android:layout_marginTop="40dp"
             android:layout_marginBottom="32dp"
             android:padding="5dp"
-            android:src="@drawable/cat"
+            android:src="@drawable/logo"
             app:shapeAppearanceOverlay="@style/Circular"
             app:strokeColor="#3E0616"
             app:strokeWidth="3dp" />
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
-            android:text="Create Account"
+            android:text="Tạo Tài Khoản"
             android:textColor="@color/black"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="32dp"
-            android:text="Sign up to get started"
+            android:text="Đăng ký để bắt đầu"
             android:textColor="#666666"
             android:textSize="16sp" />
 
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Full Name"
+            android:hint="Họ và tên"
             app:boxStrokeColor="#3E0616"
             app:hintTextColor="#3E0616"
             app:startIconDrawable="@android:drawable/ic_menu_myplaces"
@@ -93,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             app:boxStrokeColor="#3E0616"
             app:hintTextColor="#3E0616"
             app:passwordToggleEnabled="true"
@@ -116,7 +116,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:hint="Confirm Password"
+            android:hint="Xác nhận mật khẩu"
             app:boxStrokeColor="#3E0616"
             app:hintTextColor="#3E0616"
             app:passwordToggleEnabled="true"
@@ -141,7 +141,7 @@
             android:layout_height="56dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#3E0616"
-            android:text="Sign Up"
+            android:text="Đăng Ký"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -189,7 +189,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Already have an account? "
+                android:text="Đã có tài khoản? "
                 android:textColor="#666666"
                 android:textSize="14sp" />
 
@@ -197,7 +197,7 @@
                 android:id="@+id/tvLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign In"
+                android:text="Đăng Nhập"
                 android:textColor="#3E0616"
                 android:textSize="14sp"
                 android:textStyle="bold"

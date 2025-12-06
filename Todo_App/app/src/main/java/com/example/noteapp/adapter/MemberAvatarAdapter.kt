@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.noteapp.databinding.ItemMemberAvatarBinding
 import com.example.noteapp.model.WorkspaceMember
 
-class MemberAvatarAdapter : ListAdapter<WorkspaceMember, MemberAvatarAdapter.ViewHolder>(DiffCallback()) {
+class MemberAvatarAdapter(
+    private val onMemberClick: (WorkspaceMember) -> Unit = {}
+) : ListAdapter<WorkspaceMember, MemberAvatarAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemMemberAvatarBinding.inflate(
@@ -17,15 +19,17 @@ class MemberAvatarAdapter : ListAdapter<WorkspaceMember, MemberAvatarAdapter.Vie
             parent,
             false
         )
-        return ViewHolder(binding)
+        return ViewHolder(binding, onMemberClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder(private val binding: ItemMemberAvatarBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(
+        private val binding: ItemMemberAvatarBinding,
+        private val onMemberClick: (WorkspaceMember) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(member: WorkspaceMember) {
             // Get initials from email
@@ -38,6 +42,11 @@ class MemberAvatarAdapter : ListAdapter<WorkspaceMember, MemberAvatarAdapter.Vie
             
             // Show name or email
             binding.textMemberName.text = member.userEmail.substringBefore("@")
+            
+            // Set click listener
+            binding.root.setOnClickListener {
+                onMemberClick(member)
+            }
         }
 
         private fun getInitials(email: String): String {

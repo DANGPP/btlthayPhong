@@ -26,6 +26,7 @@ import com.example.noteapp.model.ToDo
 import com.example.noteapp.model.TodoStatus
 import com.example.noteapp.model.TimeSlot
 import com.example.noteapp.viewmodel.CalendarViewModel
+import com.example.noteapp.viewmodel.WorkspaceViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -77,6 +78,7 @@ class CalendarFragment : Fragment() {
         selectedDate = Calendar.getInstance()
         currentWeekStart = getWeekStart(selectedDate)
 
+        setupUserName()
         setupViewModel()
         setupClickListeners()
         setupRecyclerView()
@@ -85,6 +87,12 @@ class CalendarFragment : Fragment() {
 
         // Load initial data for today
         loadTodosForDate(selectedDate)
+    }
+
+    private fun setupUserName() {
+        val sessionManager = SessionManager(requireContext())
+        val userName = sessionManager.getUserName() ?: "User"
+        binding.textUserName.text = userName
     }
 
     private fun setupViewModel() {
@@ -649,13 +657,47 @@ class CalendarFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
+        
+        // Setup notification badge
+        val notificationItem = menu.findItem(R.id.action_notifications)
+        notificationItem?.actionView?.let { actionView ->
+            val badge = actionView.findViewById<com.example.noteapp.ui.NotificationBadgeView>(R.id.notification_badge)
+            val icon = actionView.findViewById<android.widget.ImageView>(R.id.notification_icon)
+            
+            // Load invitation count
+            val workspaceViewModel = ViewModelProvider(
+                requireActivity(),
+                WorkspaceViewModel.WorkspaceViewModelFactory(requireContext())
+            )[WorkspaceViewModel::class.java]
+            
+            val userEmail = SessionManager(requireContext()).getUserEmail()
+            if (userEmail != null) {
+                workspaceViewModel.loadPendingInvitations(userEmail)
+                workspaceViewModel.invitations.observe(viewLifecycleOwner) { invitations ->
+                    val count = invitations.size
+                    badge?.setCount(count)
+                }
+            }
+            
+            // Click listener
+            actionView.setOnClickListener {
+                com.example.noteapp.ui.InvitationsBottomSheet().show(
+                    parentFragmentManager,
+                    com.example.noteapp.ui.InvitationsBottomSheet.TAG
+                )
+            }
+        }
+        
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_workspaces -> {
-                findNavController().navigate(R.id.workspaceFragment)
+            R.id.action_notifications -> {
+                com.example.noteapp.ui.InvitationsBottomSheet().show(
+                    parentFragmentManager,
+                    com.example.noteapp.ui.InvitationsBottomSheet.TAG
+                )
                 true
             }
             R.id.action_logout -> {
@@ -668,15 +710,13 @@ class CalendarFragment : Fragment() {
 
     private fun handleLogout() {
         lifecycleScope.launch {
-            val repo = AuthRepositoryImpl(requireContext())
-            val sessionManager = SessionManager(requireContext())
-            val success = repo.logout()
+            val authManager = com.example.noteapp.auth.CustomAuthManager(requireContext())
+            val success = authManager.logout()
             if (success) {
-                sessionManager.clearSession()
-                Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_calendarFragment_to_loginFragment)
             } else {
-                Toast.makeText(requireContext(), "Logout failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Đăng xuất thất bại", Toast.LENGTH_SHORT).show()
             }
         }
     }

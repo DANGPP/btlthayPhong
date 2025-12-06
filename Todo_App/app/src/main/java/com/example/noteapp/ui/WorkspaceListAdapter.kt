@@ -10,7 +10,8 @@ import com.example.noteapp.model.Workspace
 
 class WorkspaceListAdapter(
     private val onWorkspaceClick: (Workspace) -> Unit,
-    private val onDeleteClick: (Workspace) -> Unit
+    private val onDeleteClick: (Workspace) -> Unit,
+    private val onLeaveClick: (Workspace) -> Unit
 ) : ListAdapter<Workspace, WorkspaceListAdapter.WorkspaceViewHolder>(WorkspaceDiffCallback()) {
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkspaceViewHolder {
@@ -34,8 +35,30 @@ class WorkspaceListAdapter(
             binding.apply {
                 textViewWorkspaceName.text = workspace.name
                 textViewWorkspaceDescription.text = workspace.description.ifEmpty { "No description" }
+                
+                // Display owner email
+                val sessionManager = com.example.noteapp.auth.SessionManager(root.context)
+                val currentUserId = sessionManager.getCurrentUserId()
+                val isOwner = workspace.ownerId == currentUserId
+                
+                val ownerText = if (isOwner) {
+                    "Owner: Bạn"
+                } else {
+                    "Owner: ${workspace.ownerEmail.ifEmpty { "Unknown" }}"
+                }
+                textViewOwner.text = ownerText
+                
                 textViewMemberCount.text = "Workspace" // Will show member count after loading members
                 textViewCreatedTime.text = workspace.createdTime
+                
+                // Show delete button only for owner, show leave button for others
+                if (isOwner) {
+                    buttonDeleteWorkspace.visibility = android.view.View.VISIBLE
+                    buttonLeaveWorkspace.visibility = android.view.View.GONE
+                } else {
+                    buttonDeleteWorkspace.visibility = android.view.View.GONE
+                    buttonLeaveWorkspace.visibility = android.view.View.VISIBLE
+                }
                 
                 root.setOnClickListener {
                     onWorkspaceClick(workspace)
@@ -43,6 +66,10 @@ class WorkspaceListAdapter(
                 
                 buttonDeleteWorkspace.setOnClickListener {
                     onDeleteClick(workspace)
+                }
+                
+                buttonLeaveWorkspace.setOnClickListener {
+                    onLeaveClick(workspace)
                 }
             }
         }

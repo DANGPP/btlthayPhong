@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+    
+    <!-- Search Box -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tìm kiếm theo email"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextSearchUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+    
+    <!-- User List -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn người dùng"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="?attr/colorOnSurface" />
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewUsers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:maxHeight="300dp"
+        android:nestedScrollingEnabled="true" />
+    
+    <!-- Empty State -->
+    <TextView
+        android:id="@+id/textEmptyUsers"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="Không tìm thấy người dùng"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+    
+    <!-- Selected Count -->
+    <TextView
+        android:id="@+id/textSelectedCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đã chọn: 0"
+        android:textSize="12sp"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginTop="8dp" />
+    
+    <!-- Role Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vai trò"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="?attr/colorOnSurface" />
+    
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:checkedChip="@id/chipViewer">
+        
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+        
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipEditor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editor"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+        
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipViewer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Viewer"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+    </com.google.android.material.chip.ChipGroup>
+    
+    <!-- Role Description -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• Admin: Toàn quyền\n• Editor: Xem, tạo, sửa, xóa tasks\n• Viewer: Chỉ xem"
+        android:textSize="12sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginTop="4dp" />
+    
+</LinearLayout>

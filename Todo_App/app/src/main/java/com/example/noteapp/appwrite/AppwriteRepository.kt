@@ -116,6 +116,131 @@ class AppwriteRepository(private val context: Context) {
         }
     }
     
+    // Get user by email
+    suspend fun getUserByEmail(email: String): User? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val documents = databases.listDocuments(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    queries = listOf(
+                        Query.equal("email", email),
+                        Query.limit(1)
+                    )
+                )
+                
+                documents.documents.firstOrNull()?.let { documentToUser(it) }
+            } catch (e: AppwriteException) {
+                Log.e(TAG, "Failed to get user by email: ${e.message}")
+                null
+            } catch (e: Exception) {
+                Log.e(TAG, "Unexpected error getting user by email: ${e.message}")
+                null
+            }
+        }
+    }
+    
+    // Search users by email
+    suspend fun searchUsersByEmail(query: String): List<User> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val documents = databases.listDocuments(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    queries = listOf(
+                        Query.search("email", query),
+                        Query.limit(50)
+                    )
+                )
+                
+                Log.d(TAG, "Found ${documents.documents.size} users matching: $query")
+                documents.documents.mapNotNull { documentToUser(it) }
+            } catch (e: AppwriteException) {
+                Log.e(TAG, "Failed to search users: ${e.message}")
+                emptyList()
+            } catch (e: Exception) {
+                Log.e(TAG, "Unexpected error searching users: ${e.message}")
+                emptyList()
+            }
+        }
+    }
+    
+    // Update user name
+    suspend fun updateUserName(userId: String, newName: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                databases.updateDocument(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    documentId = userId,
+                    data = mapOf("name" to newName)
+                )
+                Log.d(TAG, "Updated user name successfully")
+                true
+            } catch (e: AppwriteException) {
+                Log.e(TAG, "Failed to update user name: ${e.message}")
+                false
+            } catch (e: Exception) {
+                Log.e(TAG, "Unexpected error updating user name: ${e.message}")
+                false
+            }
+        }
+    }
+    
+    // Change user password
+    suspend fun changePassword(userId: String, currentPassword: String, newPassword: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Get current user to verify password
+                val userDoc = databases.getDocument(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    documentId = userId
+                )
+                
+                // Get password directly from document data
+                val storedPassword = userDoc.data["password"] as? String
+                if (storedPassword == null) {
+                    Log.e(TAG, "User password not found")
+                    return@withContext false
+                }
+                
+                // Verify current password (hash it first)
+                val hashedCurrentPassword = hashPassword(currentPassword)
+                if (storedPassword != hashedCurrentPassword) {
+                    Log.e(TAG, "Current password is incorrect")
+                    return@withContext false
+                }
+                
+                // Update with new hashed password
+                val hashedNewPassword = hashPassword(newPassword)
+                databases.updateDocument(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    documentId = userId,
+                    data = mapOf("password" to hashedNewPassword)
+                )
+                
+                Log.d(TAG, "Password changed successfully")
+                true
+            } catch (e: AppwriteException) {
+                Log.e(TAG, "Failed to change password: ${e.message}")
+                false
+            } catch (e: Exception) {
+                Log.e(TAG, "Unexpected error changing password: ${e.message}")
+                false
+            }
+        }
+    }
+    
+    // Hash password using SHA-256
+    private fun hashPassword(password: String): String {
+        val bytes = password.toByteArray()
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
+    }
+    
     // Update user
     suspend fun updateUser(userId: String, user: User): User? {
         return withContext(Dispatchers.IO) {

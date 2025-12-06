@@ -64,7 +64,7 @@ class AllDayTaskCardAdapter(
             setCategoryColors(todo.category)
 
             // Set priority star
-            iconStar.visibility = if (todo.priority == TodoPriority.HIGH || todo.priority == TodoPriority.URGENT) {
+            iconStar.visibility = if (todo.priority == TodoPriority.HIGH) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -131,7 +131,6 @@ class AllDayTaskCardAdapter(
 
         private fun setPriorityStyle(priority: TodoPriority) {
             val (bgColor, textColor) = when (priority) {
-                TodoPriority.URGENT -> Pair("#FFEBEE", "#D32F2F") // Red
                 TodoPriority.HIGH -> Pair("#FFF3E0", "#F57C00") // Orange
                 TodoPriority.MEDIUM -> Pair("#E8F5E8", "#388E3C") // Green
                 TodoPriority.LOW -> Pair("#F3E5F5", "#7B1FA2") // Purple

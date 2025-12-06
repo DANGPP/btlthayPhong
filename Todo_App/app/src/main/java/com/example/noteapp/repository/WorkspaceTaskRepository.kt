@@ -24,16 +24,11 @@ class WorkspaceTaskRepository(private val context: Context) {
                 "description" to task.description,
                 "workspaceId" to task.workspaceId,
                 "createdBy" to task.createdBy,
-                "assignedTo" to task.assignedTo,
-                "status" to task.status.name,
-                "priority" to task.priority.name,
+                "status" to task.status.value,
+                "priority" to task.priority.value,
                 "category" to task.category,
                 "dueDate" to task.dueDate,
-                "dueTime" to task.dueTime,
-                "estimatedHours" to task.estimatedHours,
-                "actualHours" to task.actualHours,
-                "createdAt" to task.createdAt,
-                "updatedAt" to task.updatedAt
+                "dueTime" to task.dueTime
             )
             
             val document = databases.createDocument(
@@ -57,7 +52,7 @@ class WorkspaceTaskRepository(private val context: Context) {
                 collectionId = collectionId,
                 queries = listOf(
                     Query.equal("workspaceId", workspaceId),
-                    Query.orderDesc("createdAt")
+                    Query.orderDesc("\$createdAt")
                 )
             )
             
@@ -68,7 +63,7 @@ class WorkspaceTaskRepository(private val context: Context) {
         }
     }
     
-    // Get tasks assigned to user
+    // Get tasks assigned to user (currently returns tasks created by user)
     suspend fun getMyTasks(workspaceId: String, userId: String): Result<List<WorkspaceTask>> = withContext(Dispatchers.IO) {
         try {
             val documents = databases.listDocuments(
@@ -76,8 +71,8 @@ class WorkspaceTaskRepository(private val context: Context) {
                 collectionId = collectionId,
                 queries = listOf(
                     Query.equal("workspaceId", workspaceId),
-                    Query.search("assignedTo", userId),
-                    Query.orderDesc("createdAt")
+                    Query.equal("createdBy", userId),
+                    Query.orderDesc("\$createdAt")
                 )
             )
             
@@ -94,15 +89,11 @@ class WorkspaceTaskRepository(private val context: Context) {
             val data = mapOf(
                 "title" to task.title,
                 "description" to task.description,
-                "assignedTo" to task.assignedTo,
-                "status" to task.status.name,
-                "priority" to task.priority.name,
+                "status" to task.status.value,
+                "priority" to task.priority.value,
                 "category" to task.category,
                 "dueDate" to task.dueDate,
-                "dueTime" to task.dueTime,
-                "estimatedHours" to task.estimatedHours,
-                "actualHours" to task.actualHours,
-                "updatedAt" to System.currentTimeMillis()
+                "dueTime" to task.dueTime
             )
             
             val document = databases.updateDocument(
@@ -122,8 +113,7 @@ class WorkspaceTaskRepository(private val context: Context) {
     suspend fun updateTaskStatus(taskId: String, status: TodoStatus): Result<WorkspaceTask> = withContext(Dispatchers.IO) {
         try {
             val data = mapOf(
-                "status" to status.name,
-                "updatedAt" to System.currentTimeMillis()
+                "status" to status.value
             )
             
             val document = databases.updateDocument(
@@ -161,8 +151,8 @@ class WorkspaceTaskRepository(private val context: Context) {
                 collectionId = collectionId,
                 queries = listOf(
                     Query.equal("workspaceId", workspaceId),
-                    Query.equal("status", status.name),
-                    Query.orderDesc("createdAt")
+                    Query.equal("status", status.value),
+                    Query.orderDesc("\$createdAt")
                 )
             )
             
@@ -181,16 +171,16 @@ class WorkspaceTaskRepository(private val context: Context) {
             description = document.data["description"] as? String ?: "",
             workspaceId = document.data["workspaceId"] as? String ?: "",
             createdBy = document.data["createdBy"] as? String ?: "",
-            assignedTo = (document.data["assignedTo"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
-            status = TodoStatus.valueOf(document.data["status"] as? String ?: "TODO"),
-            priority = TodoPriority.valueOf(document.data["priority"] as? String ?: "MEDIUM"),
+            assignedTo = emptyList(), // Schema doesn't support assignedTo yet
+            status = TodoStatus.fromValue(document.data["status"] as? String ?: "to_do"),
+            priority = TodoPriority.fromValue(document.data["priority"] as? String ?: "medium"),
             category = document.data["category"] as? String ?: "Chung",
             dueDate = document.data["dueDate"] as? String,
             dueTime = document.data["dueTime"] as? String,
-            estimatedHours = (document.data["estimatedHours"] as? Number)?.toInt() ?: 0,
-            actualHours = (document.data["actualHours"] as? Number)?.toInt() ?: 0,
-            createdAt = (document.data["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis(),
-            updatedAt = (document.data["updatedAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
+            estimatedHours = 0, // Schema doesn't support estimatedHours yet
+            actualHours = 0, // Schema doesn't support actualHours yet
+            createdAt = System.currentTimeMillis(), // Using Appwrite's $createdAt instead
+            updatedAt = System.currentTimeMillis() // Using Appwrite's $updatedAt instead
         )
     }
 }

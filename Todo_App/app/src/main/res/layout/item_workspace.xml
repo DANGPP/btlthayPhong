@@ -42,12 +42,22 @@
                     android:textColor="?android:attr/textColorSecondary" />
 
                 <TextView
+                    android:id="@+id/textViewOwner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Owner: user@example.com"
+                    android:textSize="12sp"
+                    android:layout_marginTop="8dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textStyle="italic" />
+
+                <TextView
                     android:id="@+id/textViewMemberCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 members"
                     android:textSize="12sp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:textColor="?android:attr/textColorSecondary" />
 
                 <TextView
@@ -68,7 +78,18 @@
                 android:layout_gravity="center_vertical"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Delete Workspace"
-                android:src="@android:drawable/ic_menu_delete" />
+                android:src="@android:drawable/ic_menu_delete"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/buttonLeaveWorkspace"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Leave Workspace"
+                android:src="@android:drawable/ic_menu_revert"
+                android:visibility="gone" />
 
         </LinearLayout>
 

@@ -179,7 +179,6 @@ class DayTaskAdapter(
 
         private fun setPriorityStyle(priority: TodoPriority) {
             val (bgColor, textColor) = when (priority) {
-                TodoPriority.URGENT -> Pair("#FFEBEE", "#D32F2F")
                 TodoPriority.HIGH -> Pair("#FFF3E0", "#F57C00")
                 TodoPriority.MEDIUM -> Pair("#E8F5E8", "#388E3C")
                 TodoPriority.LOW -> Pair("#F3E5F5", "#7B1FA2")

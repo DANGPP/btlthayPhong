@@ -3,15 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <item
-        android:id="@+id/action_invitations"
-        android:title="Lời Mời"
-        android:icon="@android:drawable/ic_menu_send"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/action_notifications"
+        android:title="Thông Báo"
+        android:icon="@android:drawable/ic_popup_reminder"
+        app:showAsAction="always"
+        app:actionLayout="@layout/notification_badge_layout"/>
     
     <item
-        android:id="@+id/action_refresh"
-        android:title="Làm Mới"
-        android:icon="@android:drawable/ic_menu_rotate"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/action_logout"
+        android:title="Đăng Xuất"
+        android:icon="@android:drawable/ic_lock_power_off"
+        app:showAsAction="never"/>
     
 </menu>

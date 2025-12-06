@@ -2,9 +2,12 @@ package com.example.noteapp.ui
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteapp.R
 import com.example.noteapp.databinding.FragmentWorkspaceBinding
@@ -12,6 +15,7 @@ import com.example.noteapp.viewmodel.WorkspaceViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 class WorkspaceFragment : Fragment() {
     private var _binding: FragmentWorkspaceBinding? = null
@@ -60,6 +64,9 @@ class WorkspaceFragment : Fragment() {
             },
             onDeleteClick = { workspace ->
                 confirmDeleteWorkspace(workspace.id, workspace.name)
+            },
+            onLeaveClick = { workspace ->
+                confirmLeaveWorkspace(workspace.id, workspace.name)
             }
         )
         
@@ -97,10 +104,13 @@ class WorkspaceFragment : Fragment() {
             if (invitations.isNotEmpty()) {
                 Snackbar.make(
                     binding.root,
-                    "Bạn có ${invitations.size} lời mời chờ xử lý. Kiểm tra menu → Lời Mời",
+                    "Bạn có ${invitations.size} lời mời chờ xử lý",
                     Snackbar.LENGTH_LONG
                 ).setAction("Xem") {
-                    showInvitationsDialog()
+                    InvitationsBottomSheet().show(
+                        parentFragmentManager,
+                        InvitationsBottomSheet.TAG
+                    )
                 }.show()
             }
         }
@@ -150,27 +160,73 @@ class WorkspaceFragment : Fragment() {
             .show()
     }
     
+    private fun confirmLeaveWorkspace(workspaceId: String, workspaceName: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Rời Không Gian")
+            .setMessage("Bạn có chắc chắn muốn rời khỏi \"$workspaceName\"?")
+            .setPositiveButton("Rời") { _, _ ->
+                viewModel.leaveWorkspace(workspaceId)
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+    
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_workspace, menu)
+        setupNotificationBadge(menu)
+    }
+    
+    private fun setupNotificationBadge(menu: Menu) {
+        val notificationItem = menu.findItem(R.id.action_notifications)
+        val actionView = notificationItem?.actionView
+        
+        if (actionView != null) {
+            val badgeView = actionView.findViewById<com.example.noteapp.ui.NotificationBadgeView>(R.id.notification_badge)
+            
+            // Observe invitations count
+            viewModel.invitations.observe(viewLifecycleOwner) { invitations ->
+                val count = invitations?.size ?: 0
+                badgeView?.setCount(count)
+            }
+            
+            // Handle click on notification icon
+            actionView.setOnClickListener {
+                InvitationsBottomSheet().show(
+                    parentFragmentManager,
+                    InvitationsBottomSheet.TAG
+                )
+            }
+        }
     }
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_invitations -> {
-                showInvitationsDialog()
+            R.id.action_notifications -> {
+                InvitationsBottomSheet().show(
+                    parentFragmentManager,
+                    InvitationsBottomSheet.TAG
+                )
                 true
             }
-            R.id.action_refresh -> {
-                viewModel.loadWorkspaces()
+            R.id.action_logout -> {
+                handleLogout()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
     
-    private fun showInvitationsDialog() {
-        val fragment = InvitationsFragment()
-        fragment.show(parentFragmentManager, "invitations")
+    private fun handleLogout() {
+        lifecycleScope.launch {
+            val authManager = com.example.noteapp.auth.CustomAuthManager(requireContext())
+            val success = authManager.logout()
+            if (success) {
+                Toast.makeText(requireContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.loginFragment)
+            } else {
+                Toast.makeText(requireContext(), "Đăng xuất thất bại", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     
     override fun onDestroyView() {

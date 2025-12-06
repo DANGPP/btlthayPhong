@@ -150,10 +150,6 @@ class ToDoFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_workspaces -> {
-                findNavController().navigate(R.id.workspaceFragment)
-                true
-            }
             R.id.action_logout -> {
                 handleLogout()
                 true

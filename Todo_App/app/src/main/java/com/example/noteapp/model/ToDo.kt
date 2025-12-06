@@ -102,10 +102,9 @@ enum class BoardColumn(val displayName: String, val status: List<TodoStatus>) {
 }
 
 enum class TodoPriority(val value: String, val displayName: String) {
-    LOW("low", "Low"),
-    MEDIUM("medium", "Medium"),
-    HIGH("high", "High"),
-    URGENT("urgent", "Urgent");
+    LOW("low", "Thấp"),
+    MEDIUM("medium", "Trung bình"),
+    HIGH("high", "Cao");
 
     companion object {
         fun fromValue(value: String): TodoPriority {

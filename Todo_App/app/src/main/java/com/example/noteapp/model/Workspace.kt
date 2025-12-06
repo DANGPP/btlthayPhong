@@ -10,6 +10,7 @@ data class Workspace(
     var name: String,
     var description: String = "",
     var ownerId: String, // User tạo workspace
+    var ownerEmail: String = "", // Email của owner
     var createdTime: String
 ) : Serializable
 
@@ -20,7 +21,6 @@ data class WorkspaceMember(
     var id: String = "",
     var workspaceId: String,
     var userId: String,
-    var userName: String = "",
     var userEmail: String = "",
     var role: WorkspaceRole = WorkspaceRole.VIEWER,
     var joinedTime: String,

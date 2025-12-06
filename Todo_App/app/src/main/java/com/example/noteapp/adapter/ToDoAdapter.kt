@@ -117,7 +117,6 @@ class ToDoAdapter(
                     TodoPriority.LOW -> R.color.priority_low
                     TodoPriority.MEDIUM -> R.color.priority_medium
                     TodoPriority.HIGH -> R.color.priority_high
-                    TodoPriority.URGENT -> R.color.priority_urgent
                 }
                 
                 setBackgroundColor(ContextCompat.getColor(context, priorityColor))

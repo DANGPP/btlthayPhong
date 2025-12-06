@@ -102,8 +102,8 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.smartScheduleFragment)
                     true
                 }
-                R.id.nav_statistics -> {
-                    navController.navigate(R.id.statisticsFragment)
+                R.id.nav_workspace -> {
+                    navController.navigate(R.id.workspaceFragment)
                     true
                 }
                 else -> false

@@ -93,7 +93,6 @@ class TodoPreviewAdapter(
                 TodoPriority.LOW -> R.drawable.priority_low_background
                 TodoPriority.MEDIUM -> R.drawable.priority_medium_background
                 TodoPriority.HIGH -> R.drawable.priority_high_background
-                TodoPriority.URGENT -> R.drawable.priority_urgent_background
             }
         }
 

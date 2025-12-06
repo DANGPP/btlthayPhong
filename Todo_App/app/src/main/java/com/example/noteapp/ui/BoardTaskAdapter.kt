@@ -52,7 +52,6 @@ class BoardTaskAdapter(
                 
                 // Priority badge
                 val priorityColor = when(task.priority) {
-                    com.example.noteapp.model.TodoPriority.URGENT -> R.color.priority_urgent
                     com.example.noteapp.model.TodoPriority.HIGH -> R.color.priority_high
                     com.example.noteapp.model.TodoPriority.MEDIUM -> R.color.priority_medium
                     com.example.noteapp.model.TodoPriority.LOW -> R.color.priority_low

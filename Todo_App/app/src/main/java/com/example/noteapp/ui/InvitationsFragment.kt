@@ -48,10 +48,10 @@ class InvitationsFragment : BottomSheetDialogFragment() {
     private fun setupRecyclerView() {
         invitationAdapter = InvitationAdapter(
             onAcceptClick = { invitation ->
-                viewModel.acceptInvitation(invitation)
+                viewModel.acceptInvitation(invitation.id)
             },
             onDeclineClick = { invitation ->
-                viewModel.declineInvitation(invitation.id)
+                viewModel.rejectInvitation(invitation.id)
             }
         )
         

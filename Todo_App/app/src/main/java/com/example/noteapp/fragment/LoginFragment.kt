@@ -62,19 +62,15 @@ class LoginFragment : Fragment() {
 
         when {
             email.isEmpty() -> {
-                showError("Please enter your email")
+                showError("Vui lòng nhập email")
                 return false
             }
             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                showError("Please enter a valid email address")
+                showError("Email không hợp lệ")
                 return false
             }
             password.isEmpty() -> {
-                showError("Please enter your password")
-                return false
-            }
-            password.length < 6 -> {
-                showError("Password must be at least 6 characters")
+                showError("Vui lòng nhập mật khẩu")
                 return false
             }
         }

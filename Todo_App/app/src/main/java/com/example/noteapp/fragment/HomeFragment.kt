@@ -173,6 +173,10 @@ class HomeFragment : Fragment() {
               // Toast.makeText(context,linearLayoutBoolean.toString(), Toast.LENGTH_SHORT).show()
                childFragmentManager.setFragmentResult("noteLayoutManager", bundleOf("bundleKey" to linearLayoutBoolean))
            }
+           R.id.profile_edit -> {
+               val direction = HomeFragmentDirections.actionHomeFragmentToProfileEditFragment()
+               findNavController().navigate(direction)
+           }
            R.id.logout -> {
                handleLogout()
            }

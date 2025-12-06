@@ -168,7 +168,6 @@ class OpenAIService(private val apiKey: String) : AIService {
             "LOW" -> TodoPriority.LOW
             "MEDIUM" -> TodoPriority.MEDIUM
             "HIGH" -> TodoPriority.HIGH
-            "URGENT" -> TodoPriority.URGENT
             else -> TodoPriority.MEDIUM
         }
     }

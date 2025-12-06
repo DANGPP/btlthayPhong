@@ -1,24 +1,29 @@
 package com.example.noteapp.appwrite
 
 import android.content.Context
+import android.util.Log
 import io.appwrite.ID
+import io.appwrite.Query
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.User
 import io.appwrite.services.Account
+import io.appwrite.services.Databases
 
 class AuthService(private val context: Context) {
     private val account: Account
+    private val databases: Databases
 
     init {
         AppwriteConfig.init(context)
         account = AppwriteConfig.account
+        databases = AppwriteConfig.getDatabases(context)
     }
 
     // Register new user and automatically login
     suspend fun register(email: String, password: String, name: String): AuthResult {
         return try {
             // First, create the user account
-            account.create(
+            val authUser = account.create(
                 userId = ID.unique(),
                 email = email,
                 password = password,
@@ -33,6 +38,29 @@ class AuthService(private val context: Context) {
             
             // Get the logged in user data
             val user = account.get()
+            
+            // Create user in database
+            try {
+                databases.createDocument(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    documentId = ID.unique(),
+                    data = mapOf(
+                        "authId" to user.id,
+                        "email" to email,
+                        "name" to name
+                    )
+                )
+                Log.d("AuthService", "User created in database: ${user.id}")
+            } catch (e: AppwriteException) {
+                // Check if user already exists (duplicate)
+                if (e.code == 409) {
+                    Log.d("AuthService", "User already exists in database")
+                } else {
+                    Log.e("AuthService", "Failed to create user in database: ${e.message}")
+                }
+            }
+            
             AuthResult.Success(user)
         } catch (e: AppwriteException) {
             // Map Appwrite exception message
@@ -51,6 +79,33 @@ class AuthService(private val context: Context) {
                 password = password
             )
             val user = account.get()
+            
+            // Check if user exists in database, create if not (migration for old users)
+            try {
+                val existingUser = databases.listDocuments(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                    queries = listOf(Query.equal("authId", user.id))
+                )
+                
+                if (existingUser.documents.isEmpty()) {
+                    // Create user in database (migration)
+                    databases.createDocument(
+                        databaseId = AppwriteConfig.DATABASE_ID,
+                        collectionId = AppwriteConfig.USER_COLLECTION_ID,
+                        documentId = ID.unique(),
+                        data = mapOf(
+                            "authId" to user.id,
+                            "email" to user.email,
+                            "name" to user.name
+                        )
+                    )
+                    Log.d("AuthService", "Migrated user to database: ${user.id}")
+                }
+            } catch (e: AppwriteException) {
+                Log.e("AuthService", "Failed to check/create user in database: ${e.message}")
+            }
+            
             AuthResult.Success(user)
         } catch (e: AppwriteException) {
             // Do not expose internal details to logs in production; return user-friendly message

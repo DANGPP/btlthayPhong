@@ -6,8 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.appwrite.AuthResult
-import com.example.noteapp.auth.AuthRepositoryImpl
-import com.example.noteapp.auth.SessionManager
+import com.example.noteapp.auth.CustomAuthManager
 import kotlinx.coroutines.launch
 
 sealed class AuthUiState {
@@ -20,8 +19,7 @@ sealed class AuthUiState {
 class LoginViewModel(context: Context) : ViewModel() {
     // Use applicationContext to avoid leaking Activity/Fragment context
     private val appContext = context.applicationContext
-    private val repository = AuthRepositoryImpl(appContext)
-    private val sessionManager = SessionManager(appContext)
+    private val authManager = CustomAuthManager(appContext)
 
     private val _state = MutableLiveData<AuthUiState>(AuthUiState.Idle)
     val state: LiveData<AuthUiState> = _state
@@ -29,11 +27,9 @@ class LoginViewModel(context: Context) : ViewModel() {
     fun login(email: String, password: String) {
         _state.value = AuthUiState.Loading
         viewModelScope.launch {
-            when (val result = repository.login(email, password)) {
+            when (val result = authManager.login(email, password)) {
                 is AuthResult.Success -> {
-                    // Save current user id in session
-                    sessionManager.saveCurrentUserId(result.user.id)
-                    _state.value = AuthUiState.Success("Login successful")
+                    _state.value = AuthUiState.Success("Đăng nhập thành công")
                 }
                 is AuthResult.Error -> {
                     _state.value = AuthUiState.Error(result.message)
@@ -43,11 +39,7 @@ class LoginViewModel(context: Context) : ViewModel() {
     }
 
     suspend fun isLoggedIn(): Boolean {
-        // First check session storage
-        val stored = sessionManager.getCurrentUserId()
-        if (!stored.isNullOrBlank()) return true
-        // Fallback to remote check
-        return repository.isLoggedIn()
+        return authManager.isLoggedIn()
     }
 
     fun clearState() {

@@ -28,6 +28,7 @@ class WorkspaceRepository(private val context: Context) {
                     "name" to workspace.name,
                     "description" to workspace.description,
                     "ownerId" to workspace.ownerId,
+                    "ownerEmail" to workspace.ownerEmail,
                     "createdTime" to workspace.createdTime
                 )
                 
@@ -140,6 +141,39 @@ class WorkspaceRepository(private val context: Context) {
         }
     }
     
+    suspend fun leaveWorkspace(workspaceId: String, userId: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Find the member document
+                val response = databases.listDocuments(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.WORKSPACE_MEMBER_COLLECTION_ID,
+                    queries = listOf(
+                        Query.equal("workspaceId", workspaceId),
+                        Query.equal("userId", userId)
+                    )
+                )
+                
+                if (response.documents.isNotEmpty()) {
+                    val memberId = response.documents[0].id
+                    databases.deleteDocument(
+                        databaseId = AppwriteConfig.DATABASE_ID,
+                        collectionId = AppwriteConfig.WORKSPACE_MEMBER_COLLECTION_ID,
+                        documentId = memberId
+                    )
+                    Log.d(TAG, "Left workspace: $workspaceId")
+                    true
+                } else {
+                    Log.e(TAG, "Member not found in workspace")
+                    false
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to leave workspace: ${e.message}")
+                false
+            }
+        }
+    }
+    
     // ==================== WORKSPACE MEMBERS ====================
     
     suspend fun addMember(member: WorkspaceMember): WorkspaceMember? {
@@ -148,7 +182,6 @@ class WorkspaceRepository(private val context: Context) {
                 val data = mapOf(
                     "workspaceId" to member.workspaceId,
                     "userId" to member.userId,
-                    "userName" to member.userName,
                     "userEmail" to member.userEmail,
                     "role" to member.role.value,
                     "joinedTime" to member.joinedTime,
@@ -292,6 +325,26 @@ class WorkspaceRepository(private val context: Context) {
         }
     }
     
+    suspend fun getPendingInvitationsForWorkspace(workspaceId: String): List<WorkspaceInvitation> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val documents = databases.listDocuments(
+                    databaseId = AppwriteConfig.DATABASE_ID,
+                    collectionId = AppwriteConfig.WORKSPACE_INVITATION_COLLECTION_ID,
+                    queries = listOf(
+                        Query.equal("workspaceId", workspaceId),
+                        Query.equal("status", "pending")
+                    )
+                )
+                
+                documents.documents.mapNotNull { documentToInvitation(it) }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to get workspace invitations: ${e.message}")
+                emptyList()
+            }
+        }
+    }
+    
     suspend fun updateInvitationStatus(invitationId: String, status: InvitationStatus): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -318,6 +371,7 @@ class WorkspaceRepository(private val context: Context) {
                 name = document.data["name"] as? String ?: "",
                 description = document.data["description"] as? String ?: "",
                 ownerId = document.data["ownerId"] as? String ?: "",
+                ownerEmail = document.data["ownerEmail"] as? String ?: "",
                 createdTime = document.data["createdTime"] as? String ?: ""
             )
         } catch (e: Exception) {
@@ -332,7 +386,6 @@ class WorkspaceRepository(private val context: Context) {
                 id = document.id,
                 workspaceId = document.data["workspaceId"] as? String ?: "",
                 userId = document.data["userId"] as? String ?: "",
-                userName = document.data["userName"] as? String ?: "",
                 userEmail = document.data["userEmail"] as? String ?: "",
                 role = WorkspaceRole.fromValue(document.data["role"] as? String ?: "viewer"),
                 joinedTime = document.data["joinedTime"] as? String ?: "",

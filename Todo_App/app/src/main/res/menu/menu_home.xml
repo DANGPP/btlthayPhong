@@ -19,8 +19,13 @@
         app:showAsAction="ifRoom"
         />
     <item
+        android:id="@+id/profile_edit"
+        android:title="Chỉnh sửa thông tin"
+        android:icon="@drawable/ic_profile"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/logout"
-        android:title="Logout"
+        android:title="Đăng Xuất"
         android:icon="@android:drawable/ic_lock_power_off"
         app:showAsAction="never"/>
 </menu>
