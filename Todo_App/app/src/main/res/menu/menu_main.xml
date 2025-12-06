@@ -10,6 +10,12 @@
         app:actionLayout="@layout/notification_badge_layout"/>
     
     <item
+        android:id="@+id/action_profile"
+        android:title="Thông Tin Cá Nhân"
+        android:icon="@drawable/ic_profile"
+        app:showAsAction="ifRoom"/>
+    
+    <item
         android:id="@+id/action_logout"
         android:title="Đăng Xuất"
         android:icon="@android:drawable/ic_lock_power_off"

@@ -118,11 +118,6 @@ class ProfileEditFragment : Fragment() {
                 return
             }
             
-            if (newPassword.length < 6) {
-                Snackbar.make(binding.root, "Mật khẩu mới phải có ít nhất 6 ký tự", Snackbar.LENGTH_SHORT).show()
-                return
-            }
-            
             if (newPassword != confirmPassword) {
                 Snackbar.make(binding.root, "Mật khẩu xác nhận không khớp", Snackbar.LENGTH_SHORT).show()
                 return

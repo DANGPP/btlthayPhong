@@ -136,6 +136,9 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_calendarFragment_to_profileEditFragment"
+            app:destination="@id/profileEditFragment" />
     </fragment>
     
     <fragment

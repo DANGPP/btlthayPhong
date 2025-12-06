@@ -700,6 +700,10 @@ class CalendarFragment : Fragment() {
                 )
                 true
             }
+            R.id.action_profile -> {
+                findNavController().navigate(R.id.action_calendarFragment_to_profileEditFragment)
+                true
+            }
             R.id.action_logout -> {
                 handleLogout()
                 true
